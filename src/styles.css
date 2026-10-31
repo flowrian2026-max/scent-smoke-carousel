@@ -141,39 +141,59 @@
 }
 
 .fashion-backdrop {
+  overflow: hidden;
+  isolation: isolate;
   background:
-    radial-gradient(ellipse 68% 46% at 48% 12%, rgba(117, 106, 165, .2), transparent 72%),
-    radial-gradient(ellipse 36% 58% at 84% 42%, rgba(83, 73, 125, .13), transparent 72%),
-    radial-gradient(ellipse 38% 48% at 12% 80%, rgba(65, 72, 119, .14), transparent 75%),
-    linear-gradient(155deg, #0a1123 0%, #111326 36%, #1f1823 72%, #0c080d 100%);
+    radial-gradient(ellipse 24% 48% at 50% 27%, rgba(139, 126, 190, .17), transparent 76%),
+    radial-gradient(ellipse 48% 36% at 51% 4%, rgba(100, 91, 151, .22), transparent 78%),
+    radial-gradient(ellipse 34% 58% at 5% 42%, rgba(49, 57, 103, .2), transparent 78%),
+    radial-gradient(ellipse 36% 54% at 96% 47%, rgba(74, 51, 92, .18), transparent 78%),
+    linear-gradient(180deg, #080b18 0%, #0b1020 34%, #141323 66%, #080910 100%);
 }
 .fashion-backdrop::before {
   content: "";
   position: absolute;
-  inset: 0;
-  opacity: .36;
+  inset: -12%;
+  opacity: .72;
   background:
-    linear-gradient(90deg, transparent 0 16%, rgba(197,190,232,.055) 16.15%, transparent 16.5% 83%, rgba(197,190,232,.04) 83.2%, transparent 83.5%),
-    repeating-linear-gradient(110deg, transparent 0 84px, rgba(210,205,238,.018) 85px, transparent 87px);
-  mask-image: linear-gradient(to bottom, black, transparent 88%);
+    radial-gradient(ellipse 10% 62% at 50% 22%, rgba(189, 179, 232, .12), transparent 78%),
+    linear-gradient(105deg, transparent 0 25%, rgba(165, 154, 214, .045) 29%, transparent 36% 64%, rgba(165, 154, 214, .04) 70%, transparent 77%),
+    linear-gradient(90deg, transparent 0 12%, rgba(180, 170, 220, .055) 12.1%, transparent 12.7% 25%, rgba(180, 170, 220, .035) 25.2%, transparent 25.8% 74%, rgba(180, 170, 220, .035) 74.2%, transparent 74.8% 87%, rgba(180, 170, 220, .05) 87.2%, transparent 87.8%),
+    repeating-linear-gradient(90deg, transparent 0 118px, rgba(205, 198, 238, .018) 119px, transparent 121px);
+  filter: blur(.3px);
+  mask-image: linear-gradient(to bottom, black 0%, rgba(0,0,0,.8) 48%, transparent 94%);
+  animation: atmospheric-drift 24s ease-in-out infinite alternate;
 }
 .fashion-backdrop::after {
   content: "";
   position: absolute;
-  left: 23%;
-  top: -18%;
-  width: 54%;
-  height: 74%;
+  left: 12%;
+  top: -32%;
+  width: 76%;
+  height: 94%;
   border-radius: 50%;
-  border: 1px solid rgba(192,184,226,.055);
-  box-shadow: 0 0 110px rgba(130,120,190,.08), inset 0 0 90px rgba(130,120,190,.035);
-  transform: perspective(700px) rotateX(68deg);
+  border: 1px solid rgba(192,184,226,.075);
+  box-shadow:
+    0 0 0 28px rgba(192,184,226,.012),
+    0 0 0 72px rgba(192,184,226,.009),
+    0 0 140px rgba(130,120,190,.11),
+    inset 0 0 100px rgba(130,120,190,.045);
+  transform: perspective(760px) rotateX(66deg);
 }
 .fashion-grain {
-  opacity: .12;
-  background-image: radial-gradient(rgba(255,255,255,.24) .45px, transparent .7px);
-  background-size: 5px 5px;
-  mask-image: linear-gradient(to bottom, transparent, black 24%, black 78%, transparent);
+  opacity: .1;
+  background-image:
+    radial-gradient(rgba(255,255,255,.24) .45px, transparent .7px),
+    linear-gradient(180deg, transparent 42%, rgba(3,4,12,.25) 100%);
+  background-size: 5px 5px, 100% 100%;
+  mask-image: linear-gradient(to bottom, transparent, black 18%, black 82%, transparent);
+}
+@keyframes atmospheric-drift {
+  from { transform: translate3d(-1.2%, 0, 0) scale(1); opacity: .56; }
+  to { transform: translate3d(1.2%, 1.2%, 0) scale(1.035); opacity: .82; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fashion-backdrop::before { animation: none; }
 }
 .glass-dome {
   border: 1px solid var(--glass-edge);
