@@ -74,14 +74,14 @@
   --input: oklch(0.78 0.05 285 / 20%);
   --ring: oklch(0.68 0.075 282);
   --glow: oklch(0.48 0.09 285 / 34%);
-  --gold: oklch(0.68 0.075 282);
+  --silver: oklch(0.88 0.018 265);\n  --gold: var(--silver);
   --stone: oklch(0.22 0.035 278);
   --stone-dark: oklch(0.12 0.03 270);
   --stone-vein: oklch(0.48 0.06 285 / 55%);
   --sheen: oklch(0.95 0.025 285 / 13%);
   --shadow-deep: oklch(0.04 0.02 275 / 82%);
-  --glass-edge: oklch(0.92 0.04 285 / 36%);
-  --glass-hi: oklch(0.9 0.035 285 / 24%);
+  --glass-edge: oklch(0.91 0.018 265 / 48%);
+  --glass-hi: oklch(0.94 0.014 265 / 25%);
   --glass-fill: oklch(0.75 0.06 285 / 5%);
   --chart-1: oklch(0.68 0.075 282);
   --chart-2: oklch(0.57 0.07 310);
@@ -208,4 +208,46 @@
   border: 1px solid var(--glass-edge);
   background: radial-gradient(circle at 35% 30%, var(--glass-hi), var(--glass-fill));
   box-shadow: 0 0 18px rgba(166,155,218,.2);
+}
+
+
+/* Fine silver craftsmanship on the glass cloches and turntable. */
+.glass-dome {
+  position: absolute;
+  overflow: visible;
+  border-color: rgba(214, 220, 235, .34);
+  box-shadow:
+    inset 0 0 30px rgba(211, 218, 238, .075),
+    inset 1px 0 0 rgba(245, 248, 255, .32),
+    inset -1px 0 0 rgba(165, 177, 203, .2),
+    inset 0 -9px 18px rgba(202, 211, 232, .075),
+    0 0 22px rgba(160, 174, 208, .075);
+}
+.glass-dome::before,
+.glass-dome::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.glass-dome::before {
+  background:
+    linear-gradient(90deg, rgba(232,238,250,.86), rgba(125,140,168,.25) 2px, transparent 7px) left top / 16px 2px no-repeat,
+    linear-gradient(180deg, rgba(232,238,250,.86), rgba(125,140,168,.2) 2px, transparent 7px) left top / 2px 16px no-repeat,
+    linear-gradient(270deg, rgba(232,238,250,.72), rgba(125,140,168,.2) 2px, transparent 7px) right top / 16px 2px no-repeat,
+    linear-gradient(180deg, rgba(232,238,250,.72), rgba(125,140,168,.2) 2px, transparent 7px) right top / 2px 16px no-repeat;
+  filter: drop-shadow(0 0 3px rgba(215,225,248,.25));
+}
+.glass-dome::after {
+  background:
+    linear-gradient(90deg, rgba(196,207,230,.68), transparent 82%) left bottom / 14px 1px no-repeat,
+    linear-gradient(0deg, rgba(196,207,230,.68), transparent 82%) left bottom / 1px 14px no-repeat,
+    linear-gradient(270deg, rgba(196,207,230,.68), transparent 82%) right bottom / 14px 1px no-repeat,
+    linear-gradient(0deg, rgba(196,207,230,.68), transparent 82%) right bottom / 1px 14px no-repeat;
+}
+.glass-knob {
+  border-color: rgba(221, 228, 244, .52);
+  background: radial-gradient(circle at 32% 26%, rgba(247,249,255,.42), rgba(132,145,173,.12) 48%, rgba(20,24,42,.5));
+  box-shadow: inset 0 1px 2px rgba(255,255,255,.35), 0 0 12px rgba(180,194,222,.16);
 }
