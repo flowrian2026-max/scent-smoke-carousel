@@ -23,6 +23,7 @@ export function CinematicRevealLayers({ replayKey, onPhaseChange }: Props) {
 
   useEffect(() => {
     let cancelled = false;
+    let smokeStarted = false;
     const timers = new Set<number>();
 
     const schedule = (callback: () => void, delay: number) => {
@@ -45,7 +46,8 @@ export function CinematicRevealLayers({ replayKey, onPhaseChange }: Props) {
     };
 
     const startSmoke = () => {
-      if (cancelled) return;
+      if (cancelled || smokeStarted) return;
+      smokeStarted = true;
       change("smoke");
       const smoke = smokeRef.current;
       if (smoke) {
