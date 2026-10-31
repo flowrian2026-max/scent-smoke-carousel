@@ -89,7 +89,7 @@ export function ThreePerfumeCarousel({
     let frame = 0;
     let lastRender = 0;
     let disposed = false;
-    let pointerDown: { x: number; y: number; lastX: number; slot: Slot | null; moved: boolean } | null = null;
+    let pointerDown: { x: number; y: number; lastX: number; slot: Slot | null; moved: boolean } | null = null;\n    let ready = false;
 
     const resize = () => {
       const width = Math.max(1, canvas.clientWidth || window.innerWidth);
@@ -127,7 +127,7 @@ export function ThreePerfumeCarousel({
     };
 
     const onPointerDown = (event: PointerEvent) => {
-      if (!modelReady) return;
+      if (!ready) return;
       pointerDown = {
         x: event.clientX,
         y: event.clientY,
@@ -220,7 +220,7 @@ export function ThreePerfumeCarousel({
         });
 
         resize();
-        setModelReady(true);
+        ready = true;\n        setModelReady(true);
       },
       undefined,
       () => setModelError(true),
@@ -232,7 +232,7 @@ export function ThreePerfumeCarousel({
         lastRender = now;
         carousel.rotation.y += (targetRotation - carousel.rotation.y) * 0.095;
         slots.forEach(({ group, index }) => {
-          const isSelected = index === selectedIndex;
+          const isSelected = index === selectedIndexRef.current;
           const desired = isSelected ? 1.045 : 1;
           group.scale.x += (desired - group.scale.x) * 0.08;
           group.scale.y += (desired - group.scale.y) * 0.08;
@@ -271,7 +271,7 @@ export function ThreePerfumeCarousel({
       });
       renderer.dispose();
     };
-  }, [fragrances.length, selectedIndex]);
+  }, [fragrances.length]);
 
   return (
     <>
