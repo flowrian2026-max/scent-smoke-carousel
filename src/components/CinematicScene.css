@@ -1,6 +1,5 @@
 .cinematic-layers {
   position: absolute;
-  z-index: 0;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
