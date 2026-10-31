@@ -71,11 +71,6 @@ export function CinematicRevealLayers({ replayKey, onPhaseChange }: Props) {
       startSmoke();
     }
 
-    // If the remote clip never becomes playable, continue instead of trapping the gallery.
-    schedule(() => {
-      if (curtain && curtain.readyState < 2) startSmoke();
-    }, 8500);
-
     return () => {
       cancelled = true;
       timers.forEach((id) => window.clearTimeout(id));
