@@ -39,6 +39,7 @@ function Index() {
   const rotRef = useRef(0);
   const target = useRef(0);
   const drag = useRef<{ last: number; moved: number; vel: number } | null>(null);
+  const suppressClick = useRef(false);
   const smoke = useRef<ThreeSmokeHandle | null>(null);
   const smokeTimer = useRef<number | null>(null);
   const [size, setSize] = useState({ w: 1000, h: 800 });
@@ -139,6 +140,10 @@ function Index() {
         if (!d) return;
         target.current = Math.round((rotRef.current + d.vel * 10) / STEP) * STEP;
         drag.current = null;
+        if (d.moved > 8) {
+          suppressClick.current = true;
+          window.setTimeout(() => { suppressClick.current = false; }, 120);
+        }
       }}
       onPointerCancel={() => (drag.current = null)}
     >
@@ -186,8 +191,8 @@ function Index() {
             key={p.name}
             className="absolute"
             style={{ left: x - w / 2, top: y - h * 0.92, width: w, height: h, zIndex: Math.round(depth * 10) + 20 }}
-            onPointerUp={() => {
-              if (drag.current && drag.current.moved > 8) return;
+            onClick={() => {
+              if (suppressClick.current) return;
               tap(i);
             }}
           >
