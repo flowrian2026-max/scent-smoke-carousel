@@ -245,7 +245,7 @@ function Index() {
       </p>
 
       {/* Velvet entrance curtain: a reveal layer over the original rotating four-bottle gallery. */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[60] flex overflow-hidden">
+      <div aria-hidden="true" dir="ltr" className="pointer-events-none absolute inset-0 z-[60] flex overflow-hidden">
         <div
           className="curtain-panel curtain-panel-left relative h-full w-1/2"
           style={{ background: "repeating-linear-gradient(90deg, rgba(0,0,0,.72) 0 3.5%, rgba(91,83,119,.32) 5.5%, rgba(5,8,18,.78) 9.5%, rgba(45,41,66,.22) 12%), linear-gradient(90deg,#050814 0%,#1a192b 30%,#0b1020 100%)", boxShadow: "inset -24px 0 55px rgba(0,0,0,.7), inset 0 0 90px rgba(0,0,0,.42)" }}
