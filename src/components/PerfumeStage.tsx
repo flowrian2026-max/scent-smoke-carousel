@@ -25,7 +25,7 @@ function useSmokeTexture() {
 }
 
 function Smoke({ color, active, tex }: { color: string; active: boolean; tex: THREE.Texture }) {
-  const N = 70;
+  const N = 110;
   const group = useRef<THREE.Group>(null);
   const parts = useMemo(
     () => Array.from({ length: N }, () => ({ life: 1, max: 1, x: 0, y: 0, z: 0, vx: 0, vz: 0, s: 0, r: 0, rv: 0 })),
@@ -36,7 +36,7 @@ function Smoke({ color, active, tex }: { color: string; active: boolean; tex: TH
     const g = group.current;
     if (!g) return;
     acc.current += dt;
-    const rate = 0.035;
+    const rate = 0.022;
     while (active && acc.current > rate) {
       acc.current -= rate;
       const p = parts.find((q) => q.life >= q.max);
@@ -71,10 +71,10 @@ function Smoke({ color, active, tex }: { color: string; active: boolean; tex: TH
       p.r += p.rv * dt;
       m.visible = true;
       m.position.set(p.x, p.y, p.z);
-      const s = p.s + k * 0.9;
+      const s = p.s + k * 0.7;
       m.scale.set(s, s, s);
       mat.rotation = p.r;
-      mat.opacity = Math.sin(Math.PI * Math.min(1, k * 1.1)) * 0.55 * (1 - k * 0.4);
+      mat.opacity = Math.sin(Math.PI * Math.min(1, k * 1.1)) * 0.32 * (1 - k * 0.5);
     });
   });
   return (
