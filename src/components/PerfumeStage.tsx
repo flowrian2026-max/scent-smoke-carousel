@@ -55,7 +55,7 @@ function Smoke({ color, active, tex }: { color: string; active: boolean; tex: TH
     }
     if (!active) acc.current = 0;
     g.children.forEach((child, i) => {
-      const p = parts[i];
+      const p = parts[i]!;
       const m = child as THREE.Sprite;
       const mat = m.material as THREE.SpriteMaterial;
       if (p.life >= p.max) {

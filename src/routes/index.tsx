@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [active, setActive] = useState(0);
-  const p = PERFUMES[active];
+  const p = PERFUMES[active] ?? PERFUMES[0]!;
   return (
     <main dir="rtl" className="relative h-screen w-full overflow-hidden bg-background text-foreground">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_20%,var(--glow),transparent_60%)]" />
