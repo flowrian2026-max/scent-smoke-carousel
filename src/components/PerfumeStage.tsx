@@ -134,7 +134,7 @@ function Bottle({
             clearcoat={1}
             color="#ffffff"
             attenuationColor={col}
-            attenuationDistance={0.5}
+            attenuationDistance={1.6}
           />
         </RoundedBox>
         {/* liquid */}
@@ -300,10 +300,10 @@ export default function PerfumeStage({
         vel.current = delta;
       }}
     >
-      <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 2.3, 5.6], fov: 34 }} gl={{ antialias: true }}>
+      <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 2.6, 8.2], fov: 32 }} gl={{ antialias: true }}>
         <Driver />
         <fog attach="fog" args={["#0b0908", 6, 14]} />
-        <ambientLight intensity={0.15} />
+        <ambientLight intensity={0.35} />
         <spotLight position={[2, 7, 3]} angle={0.4} penumbra={0.8} intensity={60} color="#ffe2b0" castShadow />
         <spotLight position={[-4, 3, -3]} angle={0.6} penumbra={1} intensity={20} color="#b08a50" />
         <group position={[0, -0.9, 0]}>
@@ -331,7 +331,7 @@ export default function PerfumeStage({
             <meshStandardMaterial color="#0e0c0b" roughness={0.4} metalness={0.3} />
           </mesh>
         </group>
-        <Environment resolution={256}>
+        <Environment resolution={256} environmentIntensity={1.6}>
           <Lightformer form="rect" intensity={3} position={[0, 4, 2]} scale={[6, 1, 1]} color="#ffe9c4" />
           <Lightformer form="rect" intensity={2} position={[-4, 1, 0]} rotation-y={Math.PI / 2} scale={[4, 2, 1]} />
           <Lightformer form="rect" intensity={2} position={[4, 1, 0]} rotation-y={-Math.PI / 2} scale={[4, 2, 1]} color="#ffd9a0" />
