@@ -106,11 +106,12 @@ export function ThreePerfumeCarousel({
       camera.position.z = mobile ? 8.4 : 9.8;
       camera.updateProjectionMatrix();
 
-      const radiusX = mobile ? 1.56 : Math.min(2.55, width * 0.0021);
-      const radiusZ = mobile ? 0.52 : 0.9;
+      const radiusX = mobile ? 2.35 : Math.min(2.7, width * 0.0022);
+      const radiusZ = mobile ? 0.52 : 0.86;
       slots.forEach(({ group }, index) => {
-        const angle = (index / Math.max(1, fragrances.length)) * Math.PI * 2;
-        group.position.set(Math.sin(angle) * radiusX, mobile ? -0.06 : 0, Math.cos(angle) * radiusZ);
+        const spread = (index / Math.max(1, fragrances.length - 1) - 0.5) * 2.05;
+        group.rotation.y = spread;
+        group.position.set(Math.sin(spread) * radiusX, mobile ? -0.06 : 0, Math.cos(spread) * radiusZ);
       });
     };
 
@@ -161,7 +162,7 @@ export function ThreePerfumeCarousel({
       if (!previous.moved) {
         const selected = pickSlot(event);
         if (selected) {
-          targetRotation = -(selected.index / Math.max(1, fragrances.length)) * Math.PI * 2;
+          targetRotation = -selected.group.rotation.y;
           onSelectRef.current(selected.index);
         }
       }
@@ -209,7 +210,7 @@ export function ThreePerfumeCarousel({
           });
 
           const slotGroup = new THREE.Group();
-          const angle = (index / Math.max(1, fragrances.length)) * Math.PI * 2;
+          const angle = (index / Math.max(1, fragrances.length - 1) - 0.5) * 2.05;
           slotGroup.rotation.y = angle;
           slotGroup.userData.fragranceIndex = index;
           slotGroup.add(model);
