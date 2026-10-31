@@ -345,3 +345,53 @@
 @media (prefers-reduced-motion: reduce) {
   .stage-depth, .stage-arch, .stage-floor { transform-style: flat; }
 }
+
+
+/* Soft, irregular velvet billow while the entrance curtains travel apart. */
+.curtain-panel {
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+}
+.curtain-panel::before {
+  content: "";
+  position: absolute;
+  inset: -1% -3%;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg,
+      rgba(0,0,0,.28) 0%,
+      rgba(166,157,195,.10) 9%,
+      transparent 18%,
+      rgba(0,0,0,.22) 29%,
+      rgba(157,148,190,.09) 42%,
+      transparent 53%,
+      rgba(0,0,0,.2) 67%,
+      rgba(173,164,203,.08) 81%,
+      rgba(0,0,0,.3) 100%);
+  background-size: 125% 100%;
+  mix-blend-mode: screen;
+  opacity: .72;
+  will-change: transform, background-position;
+}
+.curtain-panel-left::before {
+  transform-origin: right center;
+  animation: velvet-billow-left 3.8s ease-in-out infinite;
+}
+.curtain-panel-right::before {
+  transform-origin: left center;
+  animation: velvet-billow-right 4.2s ease-in-out infinite;
+}
+@keyframes velvet-billow-left {
+  0%, 100% { transform: perspective(900px) rotateY(0deg) skewY(0deg) scaleX(1); background-position: 0% 50%; }
+  28% { transform: perspective(900px) rotateY(-2.2deg) skewY(-.55deg) scaleX(1.025); background-position: 38% 50%; }
+  63% { transform: perspective(900px) rotateY(1.4deg) skewY(.35deg) scaleX(.985); background-position: 82% 50%; }
+}
+@keyframes velvet-billow-right {
+  0%, 100% { transform: perspective(900px) rotateY(0deg) skewY(0deg) scaleX(1); background-position: 100% 50%; }
+  34% { transform: perspective(900px) rotateY(2deg) skewY(.5deg) scaleX(1.02); background-position: 58% 50%; }
+  69% { transform: perspective(900px) rotateY(-1.3deg) skewY(-.3deg) scaleX(.99); background-position: 18% 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .curtain-panel::before { animation: none; }
+}
