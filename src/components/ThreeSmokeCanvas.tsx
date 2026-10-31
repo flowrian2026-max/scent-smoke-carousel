@@ -24,6 +24,31 @@ async function inflateRaw(data: Uint8Array): Promise<Uint8Array> {
   return new Uint8Array(await new Response(stream).arrayBuffer());
 }
 
+/** Remove the dark studio background from each real smoke frame and preserve soft smoke edges. */
+async function keyDarkBackground(source: string): Promise<string> {
+  const image = new Image();
+  image.decoding = "async";
+  image.src = source;
+  await image.decode();
+  const canvas = document.createElement("canvas");
+  canvas.width = image.naturalWidth;
+  canvas.height = image.naturalHeight;
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  if (!context) return source;
+  context.drawImage(image, 0, 0);
+  const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+  const data = pixels.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const luminance = data[i] * 0.2126 + data[i + 1] * 0.7152 + data[i + 2] * 0.0722;
+    const t = Math.max(0, Math.min(1, (luminance - 9) / 58));
+    data[i + 3] = Math.round(data[i + 3] * t * t * (3 - 2 * t));
+  }
+  context.putImageData(pixels, 0, 0);
+  return new Promise((resolve) => canvas.toBlob((blob) => {
+    resolve(blob ? URL.createObjectURL(blob) : source);
+  }, "image/webp", 0.92));
+}
+
 /** Read image entries directly from the user's ZIP exports; no generated smoke is used. */
 async function readFrameArchive(url: string): Promise<string[]> {
   const response = await fetch(url);
@@ -73,7 +98,12 @@ async function readFrameArchive(url: string): Promise<string[]> {
     if (!raw) continue;
     const extension = entry.name.split(".").pop()?.toLowerCase();
     const mime = extension === "png" ? "image/png" : extension === "webp" ? "image/webp" : "image/jpeg";
-    urls.push(URL.createObjectURL(new Blob([raw], { type: mime })));
+    const original = URL.createObjectURL(new Blob([raw], { type: mime }));
+    try {
+      urls.push(await keyDarkBackground(original));
+    } finally {
+      URL.revokeObjectURL(original);
+    }
   }
   if (!urls.length) throw new Error("Could not decode smoke image frames");
   return urls;
@@ -194,10 +224,10 @@ export function ThreeSmokeCanvas({ api }: { api: React.MutableRefObject<SmokeHan
             left: shot.x,
             top: shot.y,
             width: "clamp(230px, 38vw, 560px)",
-            height: "clamp(300px, 58vh, 680px)",
-            transform: "translate(-50%, -88%)",
-            opacity: 0.94,
-            filter: `grayscale(1) sepia(1) saturate(2.5) hue-rotate(${shot.hue - 30}deg) brightness(1.18) contrast(1.08)`,
+            height: "auto",
+            transform: "translate(-50%, -94%)",
+            opacity: 1,
+            filter: "brightness(1.12) contrast(1.06)",
           }}
         />
       )}
@@ -216,10 +246,10 @@ export function ThreeSmokeCanvas({ api }: { api: React.MutableRefObject<SmokeHan
             left: shot?.x ?? 0,
             top: shot?.y ?? 0,
             width: "clamp(230px, 38vw, 560px)",
-            height: "clamp(300px, 58vh, 680px)",
-            transform: "translate(-50%, -88%)",
-            opacity: 0.94,
-            filter: `grayscale(1) sepia(1) saturate(2.5) hue-rotate(${(shot?.hue ?? 0) - 30}deg) brightness(1.18) contrast(1.08)`,
+            height: "auto",
+            transform: "translate(-50%, -94%)",
+            opacity: 1,
+            filter: "brightness(1.12) contrast(1.06)",
           }}
         />
       ))}
