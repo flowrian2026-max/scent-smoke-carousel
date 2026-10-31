@@ -34,9 +34,11 @@ export function ThreePerfumeCarousel({
   const [modelReady, setModelReady] = useState(false);
   const [modelError, setModelError] = useState(false);
   const visibleRef = useRef(visible);
+  const selectedIndexRef = useRef(selectedIndex);
   const onSelectRef = useRef(onSelect);
 
   useEffect(() => { visibleRef.current = visible; }, [visible]);
+  useEffect(() => { selectedIndexRef.current = selectedIndex; }, [selectedIndex]);
   useEffect(() => { onSelectRef.current = onSelect; }, [onSelect]);
 
   useEffect(() => {
@@ -221,7 +223,8 @@ export function ThreePerfumeCarousel({
         });
 
         resize();
-        ready = true;\n        setModelReady(true);
+        ready = true;
+        setModelReady(true);
       },
       undefined,
       () => setModelError(true),
