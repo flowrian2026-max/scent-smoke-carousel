@@ -1,258 +1,222 @@
 import { useEffect, useRef, useState } from "react";
-import type { SmokeHandle } from "@/components/SmokeCanvas";
+import * as THREE from "three";
+import { SmokeCanvas as CanvasSmoke, type SmokeHandle } from "@/components/SmokeCanvas";
+
+type Particle = {
+  x: number; y: number; vx: number; vy: number;
+  age: number; life: number; size: number; growth: number;
+  alpha: number; seed: number; color: THREE.Color; core: boolean;
+};
+type Emitter = { x: number; y: number; elapsed: number; color: THREE.Color };
 
 export type ThreeSmokeHandle = SmokeHandle;
 
-const FRAME_ARCHIVES = [
-  "https://raw.githubusercontent.com/flowrian2026-max/Midnight-file-test/main/Untitled%20video_000.zip",
-  "https://raw.githubusercontent.com/flowrian2026-max/Midnight-file-test/main/Untitled%20video%20(1)_000.zip",
-];
-const FALLBACK_CLIPS = [
-  "https://raw.githubusercontent.com/flowrian2026-max/Midnight-file-test/7fd7c9c33163a6a0975827ab1399e69740d0e0b4/smoke-references/Untitled%20video.mp4",
-  "https://raw.githubusercontent.com/flowrian2026-max/Midnight-file-test/7fd7c9c33163a6a0975827ab1399e69740d0e0b4/smoke-references/Untitled%20video%20(1).mp4",
-];
-
-type SmokeShot = { clip: number; x: number; y: number; hue: number; key: number };
-
-function naturalCompare(a: string, b: string) {
-  return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" });
-}
-
-async function inflateRaw(data: Uint8Array): Promise<Uint8Array> {
-  if (typeof DecompressionStream === "undefined") throw new Error("ZIP decompression is unavailable");
-  const stream = new Blob([data]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
-  return new Uint8Array(await new Response(stream).arrayBuffer());
-}
-
-/** Remove the dark studio background from each real smoke frame and preserve soft smoke edges. */
-async function keyDarkBackground(source: string): Promise<string> {
-  const image = new Image();
-  image.decoding = "async";
-  image.src = source;
-  await image.decode();
-  const canvas = document.createElement("canvas");
-  canvas.width = image.naturalWidth;
-  canvas.height = image.naturalHeight;
-  const context = canvas.getContext("2d", { willReadFrequently: true });
-  if (!context) return source;
-  context.drawImage(image, 0, 0);
-  const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
-  const data = pixels.data;
-  for (let i = 0; i < data.length; i += 4) {
-    const luminance = data[i] * 0.2126 + data[i + 1] * 0.7152 + data[i + 2] * 0.0722;
-    const t = Math.max(0, Math.min(1, (luminance - 9) / 58));
-    data[i + 3] = Math.round(data[i + 3] * t * t * (3 - 2 * t));
-  }
-  context.putImageData(pixels, 0, 0);
-  return new Promise((resolve) => canvas.toBlob((blob) => {
-    resolve(blob ? URL.createObjectURL(blob) : source);
-  }, "image/webp", 0.92));
-}
-
-/** Read image entries directly from the user's ZIP exports; no generated smoke is used. */
-async function readFrameArchive(url: string): Promise<string[]> {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`Could not load smoke frame archive (${response.status})`);
-  const bytes = new Uint8Array(await response.arrayBuffer());
-  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-
-  let end = -1;
-  for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 65_557); i--) {
-    if (view.getUint32(i, true) === 0x06054b50) { end = i; break; }
-  }
-  if (end < 0) throw new Error("Invalid smoke ZIP archive");
-
-  const entryCount = view.getUint16(end + 10, true);
-  const directoryOffset = view.getUint32(end + 16, true);
-  const names: Array<{ name: string; method: number; compressed: number; size: number; offset: number }> = [];
-  let cursor = directoryOffset;
-
-  for (let i = 0; i < entryCount; i++) {
-    if (view.getUint32(cursor, true) !== 0x02014b50) break;
-    const method = view.getUint16(cursor + 10, true);
-    const compressed = view.getUint32(cursor + 20, true);
-    const size = view.getUint32(cursor + 24, true);
-    const nameLength = view.getUint16(cursor + 28, true);
-    const extraLength = view.getUint16(cursor + 30, true);
-    const commentLength = view.getUint16(cursor + 32, true);
-    const offset = view.getUint32(cursor + 42, true);
-    const name = new TextDecoder().decode(bytes.subarray(cursor + 46, cursor + 46 + nameLength));
-    if (/\.(png|jpe?g|webp)$/i.test(name) && !name.includes("__MACOSX/") && !name.split("/").some((part) => part.startsWith("."))) {
-      names.push({ name, method, compressed, size, offset });
-    }
-    cursor += 46 + nameLength + extraLength + commentLength;
-  }
-
-  names.sort((a, b) => naturalCompare(a.name, b.name));
-  if (!names.length) throw new Error("No image frames found in smoke ZIP");
-
-  const urls: string[] = [];
-  for (const entry of names) {
-    const local = entry.offset;
-    if (view.getUint32(local, true) !== 0x04034b50) continue;
-    const nameLength = view.getUint16(local + 26, true);
-    const extraLength = view.getUint16(local + 28, true);
-    const start = local + 30 + nameLength + extraLength;
-    const packed = bytes.subarray(start, start + entry.compressed);
-    const raw = entry.method === 0 ? packed : entry.method === 8 ? await inflateRaw(packed) : null;
-    if (!raw) continue;
-    const extension = entry.name.split(".").pop()?.toLowerCase();
-    const mime = extension === "png" ? "image/png" : extension === "webp" ? "image/webp" : "image/jpeg";
-    const original = URL.createObjectURL(new Blob([raw], { type: mime }));
-    try {
-      urls.push(await keyDarkBackground(original));
-    } finally {
-      URL.revokeObjectURL(original);
-    }
-  }
-  if (!urls.length) throw new Error("Could not decode smoke image frames");
-  return urls;
-}
-
-function hueFromHex(hex: string) {
-  const value = Number.parseInt(hex.replace("#", ""), 16);
-  const r = ((value >> 16) & 255) / 255;
-  const g = ((value >> 8) & 255) / 255;
-  const b = (value & 255) / 255;
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const delta = max - min;
-  if (delta === 0) return 0;
-  let hue = 0;
-  if (max === r) hue = ((g - b) / delta) % 6;
-  else if (max === g) hue = (b - r) / delta + 2;
-  else hue = (r - g) / delta + 4;
-  return (hue * 60 + 360) % 360;
-}
-
+/**
+ * Lightweight GPU-rendered smoke using Three.js Points + a soft custom shader.
+ * Particle motion is intentionally modest and the renderer is DPR-capped for mobile.
+ * Canvas 2D remains as an automatic fallback when WebGL is unavailable.
+ */
 export function ThreeSmokeCanvas({ api }: { api: React.MutableRefObject<SmokeHandle | null> }) {
-  const videos = useRef<Array<HTMLVideoElement | null>>([null, null]);
-  const nextClip = useRef(0);
-  const [frameSets, setFrameSets] = useState<string[][]>([]);
-  const [shot, setShot] = useState<SmokeShot | null>(null);
-  const [frame, setFrame] = useState(0);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [webglFailed, setWebglFailed] = useState(false);
 
   useEffect(() => {
-    let alive = true;
-    const created: string[][] = [];
-    void Promise.all(FRAME_ARCHIVES.map(async (url) => {
-      try {
-        const frames = await readFrameArchive(url);
-        created.push(frames);
-        return frames;
-      } catch (error) {
-        console.warn("Smoke frame archive unavailable; using original video:", error);
-        return [];
-      }
-    })).then((sets) => {
-      if (alive) setFrameSets(sets);
-      else created.flat().forEach(URL.revokeObjectURL);
-    });
-    return () => {
-      alive = false;
-      created.flat().forEach(URL.revokeObjectURL);
-    };
-  }, []);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-  useEffect(() => {
-    if (!shot) return;
-    const frames = frameSets[shot.clip] ?? [];
-    if (!frames.length) {
-      const video = videos.current[shot.clip];
-      if (!video) return;
-      video.pause();
-      try { video.currentTime = 0; } catch { /* metadata may still be loading */ }
-      const play = () => { void video.play().catch(() => setShot(null)); };
-      if (video.readyState >= 2) play();
-      else {
-        video.addEventListener("canplay", play, { once: true });
-        return () => video.removeEventListener("canplay", play);
-      }
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        canvas,
+        alpha: true,
+        antialias: false,
+        powerPreference: "low-power",
+        depth: false,
+        stencil: false,
+        premultipliedAlpha: true,
+      });
+    } catch {
+      setWebglFailed(true);
       return;
     }
 
-    let raf = 0;
-    let last = 0;
-    let index = 0;
-    setFrame(0);
-    const tick = (now: number) => {
-      if (now - last >= 1000 / 14) {
-        last = now;
-        index += 1;
-        if (index >= frames.length) {
-          setShot(null);
-          return;
-        }
-        setFrame(index);
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [shot?.key, frameSets]);
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(0, 1, 0, 1, -10, 10);
+    camera.position.z = 2;
 
-  useEffect(() => {
+    const capacity = 190;
+    const positions = new Float32Array(capacity * 3);
+    const sizes = new Float32Array(capacity);
+    const opacities = new Float32Array(capacity);
+    const colors = new Float32Array(capacity * 3);
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute("aSize", new THREE.BufferAttribute(sizes, 1));
+    geometry.setAttribute("aOpacity", new THREE.BufferAttribute(opacities, 1));
+    geometry.setAttribute("aColor", new THREE.BufferAttribute(colors, 3));
+
+    const material = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      depthTest: false,
+      blending: THREE.NormalBlending,
+      uniforms: { uPixelRatio: { value: 1 } },
+      vertexShader: `
+        attribute float aSize;
+        attribute float aOpacity;
+        attribute vec3 aColor;
+        uniform float uPixelRatio;
+        varying float vOpacity;
+        varying vec3 vColor;
+        void main() {
+          vOpacity = aOpacity;
+          vColor = aColor;
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+          gl_Position = projectionMatrix * mvPosition;
+          gl_PointSize = max(1.0, aSize * uPixelRatio);
+        }
+      `,
+      fragmentShader: `
+        varying float vOpacity;
+        varying vec3 vColor;
+        void main() {
+          vec2 p = gl_PointCoord - vec2(0.5);
+          float d = length(p);
+          float soft = 1.0 - smoothstep(0.04, 0.5, d);
+          float body = exp(-d * d * 8.0);
+          float alpha = vOpacity * soft * body;
+          if (alpha < 0.004) discard;
+          vec3 smokeColor = mix(vColor, vec3(0.88, 0.86, 1.0), 0.16 * soft);
+          gl_FragColor = vec4(smokeColor, alpha);
+        }
+      `,
+    });
+    const points = new THREE.Points(geometry, material);
+    points.frustumCulled = false;
+    scene.add(points);
+
+    let width = 1;
+    let height = 1;
+    let dpr = 1;
+    let frame = 0;
+    let previous = performance.now();
+    let particles: Particle[] = [];
+    let emitter: Emitter | null = null;
+
+    const resize = () => {
+      width = canvas.clientWidth || window.innerWidth;
+      height = canvas.clientHeight || window.innerHeight;
+      dpr = Math.min(window.devicePixelRatio || 1, 1.35);
+      renderer.setPixelRatio(dpr);
+      renderer.setSize(width, height, false);
+      camera.left = 0;
+      camera.right = width;
+      camera.top = 0;
+      camera.bottom = height;
+      camera.updateProjectionMatrix();
+      material.uniforms.uPixelRatio.value = dpr;
+    };
+
+    const spawn = (kind: "cloud" | "wisp" | "core" = "cloud") => {
+      if (!emitter) return;
+      const scale = Math.max(0.72, Math.min(width / 1000, 1.2));
+      const core = kind === "core";
+      const wisp = kind === "wisp";
+      particles.push({
+        x: emitter.x + (Math.random() - 0.5) * (core ? 4 : wisp ? 11 : 8) * scale,
+        y: emitter.y + (Math.random() - 0.5) * (core ? 5 : 9) * scale,
+        vx: (Math.random() - 0.5) * (core ? 13 : wisp ? 30 : 21) * scale,
+        vy: -(core ? 102 + Math.random() * 45 : wisp ? 64 + Math.random() * 48 : 48 + Math.random() * 43) * scale,
+        age: 0,
+        life: core ? 2.7 + Math.random() * 1.2 : 4 + Math.random() * 2.5,
+        size: (core ? 7 + Math.random() * 5 : wisp ? 17 + Math.random() * 15 : 25 + Math.random() * 20) * scale,
+        growth: (core ? 13 : wisp ? 22 : 27) * scale,
+        alpha: core ? 0.2 : wisp ? 0.105 : 0.12,
+        seed: Math.random() * Math.PI * 2,
+        color: emitter.color.clone(),
+        core,
+      });
+      if (particles.length > capacity) particles.splice(0, particles.length - capacity);
+    };
+
+    const render = (now: number) => {
+      const dt = Math.min((now - previous) / 1000, 0.04);
+      previous = now;
+
+      if (emitter) {
+        emitter.elapsed += dt;
+        const t = emitter.elapsed;
+        const rate = t < 1.8 ? 34 : t < 5.5 ? 19 : t < 9 ? 8 : 0;
+        if (Math.random() < rate * dt) {
+          spawn("cloud");
+          if (Math.random() > 0.38) spawn("wisp");
+        }
+        if (Math.random() < (t < 4 ? 14 : 5) * dt) spawn("core");
+        if (t > 10.5) emitter = null;
+      }
+
+      let alive = 0;
+      for (const p of particles) {
+        p.age += dt;
+        if (p.age >= p.life) continue;
+        const turbulence = Math.sin(p.age * 1.55 + p.seed);
+        const curl = Math.cos(p.age * 1.12 + p.seed * 1.7);
+        p.vx += (turbulence * 17 + curl * 7) * dt;
+        p.vy -= (4.5 + Math.sin(p.age * 0.8 + p.seed) * 3.5) * dt;
+        p.vx *= Math.exp(-0.34 * dt);
+        p.vy *= Math.exp(-0.055 * dt);
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.size += p.growth * dt;
+
+        const progress = p.age / p.life;
+        const envelope = Math.sin(Math.PI * Math.min(1, progress)) ** 1.15;
+        positions[alive * 3] = p.x;
+        positions[alive * 3 + 1] = p.y;
+        positions[alive * 3 + 2] = 0;
+        sizes[alive] = p.size;
+        opacities[alive] = p.alpha * envelope;
+        colors[alive * 3] = p.color.r;
+        colors[alive * 3 + 1] = p.color.g;
+        colors[alive * 3 + 2] = p.color.b;
+        alive++;
+      }
+      particles = particles.filter((p) => p.age < p.life);
+      for (let i = alive; i < capacity; i++) {
+        sizes[i] = 0;
+        opacities[i] = 0;
+      }
+      geometry.attributes.position.needsUpdate = true;
+      geometry.attributes.aSize.needsUpdate = true;
+      geometry.attributes.aOpacity.needsUpdate = true;
+      geometry.attributes.aColor.needsUpdate = true;
+
+      renderer.render(scene, camera);
+      frame = requestAnimationFrame(render);
+    };
+
+    resize();
+    window.addEventListener("resize", resize);
+    frame = requestAnimationFrame(render);
     api.current = {
       burst: (x, y, color) => {
-        const clip = nextClip.current;
-        nextClip.current = (nextClip.current + 1) % FRAME_ARCHIVES.length;
-        setShot({ clip, x, y, hue: hueFromHex(color), key: Date.now() });
+        particles = [];
+        emitter = { x, y, elapsed: 0, color: new THREE.Color(color) };
+        for (let i = 0; i < 18; i++) spawn(i % 3 === 0 ? "core" : i % 3 === 1 ? "wisp" : "cloud");
       },
-      stop: () => {
-        videos.current.forEach((video) => video?.pause());
-        setShot(null);
-      },
+      stop: () => { emitter = null; },
     };
+
     return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("resize", resize);
       api.current = null;
-      videos.current.forEach((video) => video?.pause());
+      geometry.dispose();
+      material.dispose();
+      renderer.dispose();
     };
   }, [api]);
 
-  const activeFrames = shot ? frameSets[shot.clip] ?? [] : [];
-  const frameSrc = activeFrames.length ? activeFrames[frame] : null;
-
-  return (
-    <div className="pointer-events-none absolute inset-0 z-30 overflow-hidden" aria-hidden="true">
-      {frameSrc && shot && (
-        <img
-          src={frameSrc}
-          alt=""
-          draggable={false}
-          className="absolute max-w-none object-contain mix-blend-screen"
-          style={{
-            left: shot.x,
-            top: shot.y,
-            width: "clamp(230px, 38vw, 560px)",
-            height: "auto",
-            transform: "translate(-50%, -94%)",
-            opacity: 1,
-            filter: "brightness(1.12) contrast(1.06)",
-          }}
-        />
-      )}
-      {FALLBACK_CLIPS.map((src, index) => (
-        <video
-          key={src}
-          ref={(node) => { videos.current[index] = node; }}
-          src={src}
-          muted
-          playsInline
-          preload="auto"
-          onEnded={() => setShot((current) => current?.clip === index ? null : current)}
-          className="absolute max-w-none object-contain mix-blend-screen"
-          style={{
-            display: shot?.clip === index && !activeFrames.length ? "block" : "none",
-            left: shot?.x ?? 0,
-            top: shot?.y ?? 0,
-            width: "clamp(230px, 38vw, 560px)",
-            height: "auto",
-            transform: "translate(-50%, -94%)",
-            opacity: 1,
-            filter: "brightness(1.12) contrast(1.06)",
-          }}
-        />
-      ))}
-    </div>
-  );
+  if (webglFailed) return <CanvasSmoke api={api} />;
+  return <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 z-30 h-full w-full" aria-hidden="true" />;
 }
