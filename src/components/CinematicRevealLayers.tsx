@@ -14,23 +14,24 @@ type Props = {
   onPhaseChange?: (phase: RevealPhase) => void;
 };
 
-/**
- * Three independent media planes:
- * 1) the curved architectural environment film,
- * 2) the curtain film followed by the full-stage smoke film,
- * 3) the interactive GLB perfume carousel is rendered above the environment
- *    and below the curtain/smoke reveal planes.
- */
+/** Environment film at the back; the curtain and smoke films form one reveal layer. */
 export function CinematicRevealLayers({ replayKey, onPhaseChange }: Props) {
   const curtainRef = useRef<HTMLVideoElement>(null);
   const smokeRef = useRef<HTMLVideoElement>(null);
+  const startSmokeRef = useRef<() => void>(() => undefined);
   const [phase, setPhase] = useState<RevealPhase>("curtain");
 
   useEffect(() => {
-    let smokeTimer = 0;
-    let revealTimer = 0;
-    let failsafeTimer = 0;
     let cancelled = false;
+    const timers = new Set<number>();
+
+    const schedule = (callback: () => void, delay: number) => {
+      const id = window.setTimeout(() => {
+        timers.delete(id);
+        if (!cancelled) callback();
+      }, delay);
+      timers.add(id);
+    };
 
     const change = (next: RevealPhase) => {
       if (cancelled) return;
@@ -40,13 +41,11 @@ export function CinematicRevealLayers({ replayKey, onPhaseChange }: Props) {
 
     const reveal = () => {
       change("retreat");
-      window.clearTimeout(revealTimer);
-      revealTimer = window.setTimeout(() => change("revealed"), 1650);
+      schedule(() => change("revealed"), 1650);
     };
 
     const startSmoke = () => {
       if (cancelled) return;
-      window.clearTimeout(failsafeTimer);
       change("smoke");
       const smoke = smokeRef.current;
       if (smoke) {
@@ -55,34 +54,33 @@ export function CinematicRevealLayers({ replayKey, onPhaseChange }: Props) {
         smoke.load();
         void smoke.play().catch(() => undefined);
       }
-      smokeTimer = window.setTimeout(reveal, 3600);
+      schedule(reveal, 3600);
     };
 
+    startSmokeRef.current = startSmoke;
+    change("curtain");
     const curtain = curtainRef.current;
     if (curtain) {
       curtain.pause();
       try { curtain.currentTime = 0; } catch { /* wait for metadata */ }
       curtain.load();
-      void curtain.play().catch(() => {
-        window.clearTimeout(failsafeTimer);
-        failsafeTimer = window.setTimeout(startSmoke, 900);
-      });
+      void curtain.play().catch(() => schedule(startSmoke, 900));
     } else {
       startSmoke();
     }
 
-    // A network-stalled film must never leave the fragrances permanently hidden.
-    failsafeTimer = window.setTimeout(() => {
+    // If the remote clip never becomes playable, continue instead of trapping the gallery.
+    schedule(() => {
       if (curtain && curtain.readyState < 2) startSmoke();
     }, 8500);
 
     return () => {
       cancelled = true;
-      window.clearTimeout(smokeTimer);
-      window.clearTimeout(revealTimer);
-      window.clearTimeout(failsafeTimer);
+      timers.forEach((id) => window.clearTimeout(id));
+      timers.clear();
       curtain?.pause();
       smokeRef.current?.pause();
+      startSmokeRef.current = () => undefined;
     };
   }, [replayKey, onPhaseChange]);
 
@@ -106,42 +104,8 @@ export function CinematicRevealLayers({ replayKey, onPhaseChange }: Props) {
         muted
         playsInline
         preload="auto"
-        onEnded={() => {
-          setPhase("smoke");
-          onPhaseChange?.("smoke");
-          const smoke = smokeRef.current;
-          if (smoke) {
-            smoke.pause();
-            try { smoke.currentTime = 0; } catch { /* wait for metadata */ }
-            smoke.load();
-            void smoke.play().catch(() => undefined);
-          }
-          window.setTimeout(() => {
-            setPhase("retreat");
-            onPhaseChange?.("retreat");
-            window.setTimeout(() => {
-              setPhase("revealed");
-              onPhaseChange?.("revealed");
-            }, 1650);
-          }, 3600);
-        }}
-        onError={() => {
-          setPhase("smoke");
-          onPhaseChange?.("smoke");
-          const smoke = smokeRef.current;
-          if (smoke) {
-            smoke.load();
-            void smoke.play().catch(() => undefined);
-          }
-          window.setTimeout(() => {
-            setPhase("retreat");
-            onPhaseChange?.("retreat");
-            window.setTimeout(() => {
-              setPhase("revealed");
-              onPhaseChange?.("revealed");
-            }, 1650);
-          }, 3600);
-        }}
+        onEnded={() => startSmokeRef.current()}
+        onError={() => startSmokeRef.current()}
       />
 
       <div className={`smoke-film-wrap smoke-${phase}`}>
