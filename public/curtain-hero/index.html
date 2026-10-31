@@ -36,13 +36,15 @@ linear-gradient(110deg,#080d1b,#171a2d 48%,#090e1b)}
 .kicker{font:9px Arial,sans-serif;letter-spacing:.46em;color:#a7b3d0;text-transform:uppercase}
 .hero-copy h1{font-size:clamp(37px,5.7vw,78px);font-weight:400;line-height:.98;letter-spacing:.095em;margin:17px 0 13px;text-shadow:0 6px 38px #03050b}
 .hero-copy p{margin:0;font:10px Arial,sans-serif;letter-spacing:.27em;color:#a9b2c8}
-.gallery{position:absolute;z-index:3;inset:0;display:flex;align-items:flex-end;justify-content:center;gap:clamp(10px,6vw,82px);padding:0 5vw clamp(48px,9vh,92px);opacity:0;transform:translateY(28px);transition:opacity 1.5s 1s,transform 1.65s 1s}
-.scene.open .gallery{opacity:1;transform:translateY(0)}
-.product{width:clamp(115px,17vw,220px);position:relative;text-align:center;cursor:pointer;outline:none;transition:transform .55s cubic-bezier(.2,.75,.2,1);filter:drop-shadow(0 20px 24px rgba(0,0,0,.45))}
-.product:hover,.product:focus-visible{transform:translateY(-13px)}
-.product:nth-child(2){transform:translateY(-26px)}
-.product:nth-child(2):hover,.product:nth-child(2):focus-visible{transform:translateY(-39px)}
-.bottle-wrap{height:clamp(178px,26vw,312px);display:flex;align-items:flex-end;justify-content:center;position:relative}
+.gallery{position:absolute;z-index:3;left:50%;top:63%;width:100%;height:clamp(270px,36vw,390px);perspective:1400px;opacity:0;transform:translate(-50%,calc(-50% + 28px));transition:opacity 1.5s 1s,transform 1.65s 1s;overflow:visible}
+.scene.open .gallery{opacity:1;transform:translate(-50%,-50%)}
+.carousel-track{position:absolute;inset:0;transform-style:preserve-3d;animation:none}
+.scene.open .carousel-track{animation:carouselSpin 38s linear infinite}
+.gallery:hover .carousel-track,.gallery:focus-within .carousel-track{animation-play-state:paused}
+@keyframes carouselSpin{from{transform:rotateY(0deg)}to{transform:rotateY(360deg)}}
+.product{--radius:clamp(190px,28vw,360px);position:absolute;left:50%;top:0;width:clamp(112px,15vw,190px);margin-left:clamp(-95px,-7.5vw,-56px);text-align:center;cursor:pointer;outline:none;transform-style:preserve-3d;transform:rotateY(calc(var(--i)*72deg)) translateZ(var(--radius));filter:drop-shadow(0 20px 24px rgba(0,0,0,.45));backface-visibility:visible;transition:filter .35s}
+.product:hover,.product:focus-visible{filter:drop-shadow(0 24px 30px rgba(130,145,195,.32)) brightness(1.08)}
+.bottle-wrap{height:clamp(178px,24vw,292px);display:flex;align-items:flex-end;justify-content:center;position:relative}
 .bottle-photo{width:100%;height:100%;object-fit:contain;object-position:center bottom;overflow:visible;filter:drop-shadow(0 16px 22px rgba(0,0,0,.34));}
 .orbit{position:absolute;z-index:-1;bottom:13px;width:92%;height:46px;border:1px solid rgba(208,220,243,.45);border-radius:50%;transform:rotateX(67deg);box-shadow:0 0 20px rgba(151,173,220,.15),inset 0 0 15px rgba(183,196,225,.08)}
 .plinth{position:relative;height:14px;width:100%;border-radius:50%;border:1px solid rgba(215,224,242,.64);background:linear-gradient(180deg,#667087 0%,#212a3d 37%,#080d1a 100%);box-shadow:0 9px 25px #02040b,inset 0 1px 3px rgba(255,255,255,.38)}
@@ -83,8 +85,9 @@ box-shadow:inset 0 0 100px 30px #02040b,0 0 40px #02040b}
  body{overflow:hidden}.scene{min-height:560px}
  .topbar{padding:19px 17px}.wordmark{font-size:13px;letter-spacing:.28em}.nav{display:none}.top-index{font-size:8px}
  .hero-copy{top:16%;width:94%}.hero-copy h1{font-size:clamp(32px,9vw,46px);letter-spacing:.06em;margin:14px 0}.hero-copy p{font-size:8px;letter-spacing:.15em;line-height:1.7}
- .gallery{gap:7px;padding:0 3vw 17vh}.product{width:31vw}.product:nth-child(2){transform:translateY(-16px)}.product:nth-child(2):hover{transform:translateY(-26px)}
- .bottle-wrap{height:clamp(156px,39vh,220px)}.product-name{font-size:8px;letter-spacing:.15em;margin-top:16px}.product-sub{font-size:7px;letter-spacing:.08em}.plinth{height:11px}.plinth:after{top:9px;height:20px}
+ .gallery{top:62%;height:260px;perspective:900px}
+ .product{--radius:clamp(135px,37vw,190px);width:27vw;margin-left:-13.5vw}
+ .bottle-wrap{height:clamp(145px,27vh,190px)}.product-name{font-size:8px;letter-spacing:.15em;margin-top:16px}.product-sub{font-size:7px;letter-spacing:.08em}.plinth{height:11px}.plinth:after{top:9px;height:20px}
  .scene-rule{display:none}.detail{right:12px;bottom:58px;width:calc(100vw - 24px);padding:17px 18px}.detail h2{font-size:19px}
  .controls{bottom:12px}.controls button{padding:8px 11px;font-size:7px}.start-note{bottom:57px;font-size:7px;letter-spacing:.18em}
 }
@@ -112,36 +115,39 @@ box-shadow:inset 0 0 100px 30px #02040b,0 0 40px #02040b}
 
   <div class="scene-rule">SCENT · FORM · ATMOSPHERE</div>
 
-  <section class="gallery" id="gallery" aria-label="Fragrance collection">
-    <article class="product" tabindex="0" role="button" aria-label="Discover Nocturne"
-      data-name="NOCTURNE" data-notes="BLACK IRIS · SMOKED CEDAR · MUSK"
-      data-description="A deep, architectural composition with a quiet and magnetic trail.">
-      <div class="bottle-wrap">
-        <img class="bottle-photo" src="https://raw.githubusercontent.com/flowrian2026-max/scent-smoke-carousel/main/src/assets/bottle-violet.png" alt="Photorealistic perfume bottle" loading="eager" draggable="false">
-        <div class="orbit"></div>
-      </div>
-      <div class="plinth"></div><div class="product-name">NOCTURNE</div><div class="product-sub">EAU DE PARFUM · 100 ML</div>
-    </article>
-
-    <article class="product" tabindex="0" role="button" aria-label="Discover Velvet Haze"
-      data-name="VELVET HAZE" data-notes="DARK ROSE · VIOLET · CASHMERE WOOD"
-      data-description="A soft floral heart wrapped in an elegant, cool and velvety finish.">
-      <div class="bottle-wrap">
-        <img class="bottle-photo" src="https://raw.githubusercontent.com/flowrian2026-max/scent-smoke-carousel/main/src/assets/bottle-rose.png" alt="Photorealistic perfume bottle" loading="eager" draggable="false">
-        <div class="orbit"></div>
-      </div>
-      <div class="plinth"></div><div class="product-name">VELVET HAZE</div><div class="product-sub">EAU DE PARFUM · 75 ML</div>
-    </article>
-
-    <article class="product" tabindex="0" role="button" aria-label="Discover Afterlight"
-      data-name="AFTERLIGHT" data-notes="BERGAMOT · MINERAL AIR · PALE CEDAR"
-      data-description="A bright mineral opening balanced by a refined, transparent woody base.">
-      <div class="bottle-wrap">
-        <img class="bottle-photo" src="https://raw.githubusercontent.com/flowrian2026-max/scent-smoke-carousel/main/src/assets/bottle-blue.png" alt="Photorealistic perfume bottle" loading="eager" draggable="false">
-        <div class="orbit"></div>
-      </div>
-      <div class="plinth"></div><div class="product-name">AFTERLIGHT</div><div class="product-sub">EAU DE PARFUM · 100 ML</div>
-    </article>
+  <section class="gallery" id="gallery" aria-label="Rotating five-fragrance collection">
+    <div class="carousel-track">
+      <article class="product" style="--i:0" tabindex="0" role="button" aria-label="Discover Nocturne"
+        data-name="NOCTURNE" data-notes="BLACK IRIS · SMOKED CEDAR · MUSK"
+        data-description="A deep, architectural composition with a quiet and magnetic trail.">
+        <div class="bottle-wrap"><img class="bottle-photo" src="https://raw.githubusercontent.com/flowrian2026-max/scent-smoke-carousel/main/src/assets/bottle-violet.png" alt="Violet perfume bottle" loading="eager" draggable="false"><div class="orbit"></div></div>
+        <div class="plinth"></div><div class="product-name">NOCTURNE</div><div class="product-sub">EAU DE PARFUM · 100 ML</div>
+      </article>
+      <article class="product" style="--i:1" tabindex="0" role="button" aria-label="Discover Velvet Haze"
+        data-name="VELVET HAZE" data-notes="DARK ROSE · VIOLET · CASHMERE WOOD"
+        data-description="A soft floral heart wrapped in an elegant, cool and velvety finish.">
+        <div class="bottle-wrap"><img class="bottle-photo" src="https://raw.githubusercontent.com/flowrian2026-max/scent-smoke-carousel/main/src/assets/bottle-rose.png" alt="Rose perfume bottle" loading="eager" draggable="false"><div class="orbit"></div></div>
+        <div class="plinth"></div><div class="product-name">VELVET HAZE</div><div class="product-sub">EAU DE PARFUM · 75 ML</div>
+      </article>
+      <article class="product" style="--i:2" tabindex="0" role="button" aria-label="Discover Afterlight"
+        data-name="AFTERLIGHT" data-notes="BERGAMOT · MINERAL AIR · PALE CEDAR"
+        data-description="A bright mineral opening balanced by a refined, transparent woody base.">
+        <div class="bottle-wrap"><img class="bottle-photo" src="https://raw.githubusercontent.com/flowrian2026-max/scent-smoke-carousel/main/src/assets/bottle-blue.png" alt="Blue perfume bottle" loading="eager" draggable="false"><div class="orbit"></div></div>
+        <div class="plinth"></div><div class="product-name">AFTERLIGHT</div><div class="product-sub">EAU DE PARFUM · 100 ML</div>
+      </article>
+      <article class="product" style="--i:3" tabindex="0" role="button" aria-label="Discover Amber Veil"
+        data-name="AMBER VEIL" data-notes="GOLDEN AMBER · VANILLA · SOFT OUD"
+        data-description="Warm amber and smooth vanilla settle into a refined, softly glowing trail.">
+        <div class="bottle-wrap"><img class="bottle-photo" src="https://raw.githubusercontent.com/flowrian2026-max/scent-smoke-carousel/main/src/assets/bottle-amber.png" alt="Amber perfume bottle" loading="eager" draggable="false"><div class="orbit"></div></div>
+        <div class="plinth"></div><div class="product-name">AMBER VEIL</div><div class="product-sub">EAU DE PARFUM · 100 ML</div>
+      </article>
+      <article class="product" style="--i:4" tabindex="0" role="button" aria-label="Discover Silver Noire"
+        data-name="SILVER NOIRE" data-notes="WHITE MUSK · IRIS · COLD WOODS"
+        data-description="A cool, luminous fragrance with a clean musk heart and a polished woody finish.">
+        <div class="bottle-wrap"><img class="bottle-photo" style="filter:hue-rotate(145deg) saturate(.78)" src="https://raw.githubusercontent.com/flowrian2026-max/scent-smoke-carousel/main/src/assets/bottle-violet.png" alt="Cool-toned perfume bottle" loading="eager" draggable="false"><div class="orbit"></div></div>
+        <div class="plinth"></div><div class="product-name">SILVER NOIRE</div><div class="product-sub">EAU DE PARFUM · 75 ML</div>
+      </article>
+    </div>
   </section>
 
   <div class="start-note">THE FRAGRANCE GALLERY IS ABOUT TO OPEN</div>
