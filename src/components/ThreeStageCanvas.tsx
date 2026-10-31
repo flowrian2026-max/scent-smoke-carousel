@@ -341,6 +341,8 @@ export function ThreeStageCanvas({ onReady }: Props) {
 
       position.needsUpdate = true;
       curtain.mesh.geometry.computeVertexNormals();
+      // Gather the cloth into narrow pleated panels at the outer edges as it opens.
+      curtain.mesh.scale.x = THREE.MathUtils.lerp(1, 0.32, opening);
       curtain.mesh.position.x =
         (curtain.side < 0 ? -3.72 : 0) +
         (curtain.side < 0 ? -1 : 1) * 2.32 * opening;
