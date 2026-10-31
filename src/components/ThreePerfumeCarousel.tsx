@@ -284,13 +284,14 @@ export function ThreePerfumeCarousel({
         ref={canvasRef}
         className={`perfume-3d-canvas ${visible ? "is-visible" : ""}`}
         aria-label="بطری‌های سه‌بعدی عطر؛ روی بطری بزنید و بکشید تا بچرخد"
+        aria-hidden={!visible}
       />
-      {modelError && (
+      {visible && modelError && (
         <div className="model-error" role="status">
           مدل سه‌بعدی بارگذاری نشد. اتصال اینترنت یا WebGL مرورگر را بررسی کنید.
         </div>
       )}
-      {!modelReady && !modelError && (
+      {visible && !modelReady && !modelError && (
         <div className="model-loading" aria-hidden="true">PREPARING THE FRAGRANCE MODELS</div>
       )}
     </>
