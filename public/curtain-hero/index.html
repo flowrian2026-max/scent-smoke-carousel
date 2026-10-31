@@ -20,10 +20,10 @@ linear-gradient(110deg,#080d1b,#171a2d 48%,#090e1b)}
 .backdrop:after{transform:translateX(24%) rotate(9deg);opacity:.6;animation-delay:-8s}
 @keyframes lightSweep{to{transform:translateX(27%) rotate(7deg)}}
 .ambient-video,.smoke-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
-.ambient-video{z-index:0;opacity:.6;mix-blend-mode:screen}
-.smoke-video{z-index:1;opacity:.55;mix-blend-mode:screen;mask-image:linear-gradient(transparent,#000 12%,#000 90%,transparent)}
+.ambient-video{z-index:0;opacity:.62;mix-blend-mode:normal;filter:brightness(.58) saturate(.78) contrast(1.12)}
+.smoke-video{z-index:1;opacity:.52;mix-blend-mode:screen;mask-image:linear-gradient(transparent,#000 12%,#000 90%,transparent)}
 /* Smoke V4 is connected as an independent screen-blended layer.
-   The environment layer remains intentionally separate for its own footage. */
+   The environment layer remains intentionally separate for its own footage. The rock-cliff video is the live environment plate; smoke stays above it and behind the bottles. */
 .halo{position:absolute;z-index:1;left:50%;top:55%;width:min(76vw,1000px);height:min(34vw,430px);transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(135,144,190,.13),transparent 67%);filter:blur(20px);pointer-events:none}
 .topbar{position:absolute;z-index:6;top:0;left:0;right:0;padding:28px clamp(20px,5vw,76px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(200,211,233,.1)}
 .wordmark{font-size:17px;letter-spacing:.34em;color:#e6eaf4;white-space:nowrap}
@@ -97,7 +97,7 @@ box-shadow:inset 0 0 100px 30px #02040b,0 0 40px #02040b}
 <body>
 <main class="scene" id="scene">
   <div class="backdrop" aria-hidden="true"></div>
-  <video class="ambient-video" id="ambientVideo" muted autoplay loop playsinline data-video-src=""></video>
+  <video class="ambient-video" id="ambientVideo" muted autoplay loop playsinline data-video-src="https://raw.githubusercontent.com/flowrian2026-max/Midnight-file-test/main/Ariooo/sakhre%20poshte%20hero.mp4"></video>
   <video class="smoke-video" id="smokeVideo" muted autoplay loop playsinline preload="metadata" data-video-src="https://raw.githubusercontent.com/flowrian2026-max/Midnight-file-test/main/smoke-references/Smoke%20version%204.mp4"></video>
   <div class="halo" aria-hidden="true"></div>
 
