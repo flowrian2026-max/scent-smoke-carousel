@@ -97,7 +97,7 @@ function Index() {
     smokeTimer.current = window.setTimeout(() => {
       smoke.current?.burst(bottleX, atomizerY, PERFUMES[i]!.color);
       smokeTimer.current = null;
-    }, 120);
+    }, 100);
   };
 
   const tap = (i: number) => {
