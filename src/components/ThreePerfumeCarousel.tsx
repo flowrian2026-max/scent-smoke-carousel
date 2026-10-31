@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-const MODEL_URL = "/models/scent-scribe-bottle.glb";
+const MODEL_URL = `${import.meta.env.BASE_URL}models/scent-scribe-bottle.glb`;
 const BOTTLE_TINTS = ["#b1a4d4", "#b889a7", "#8e96c6", "#7896b7"];
 
 export type FragranceChoice = {
