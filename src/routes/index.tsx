@@ -4,7 +4,7 @@ import amber from "@/assets/bottle-amber.png";
 import rose from "@/assets/bottle-rose.png";
 import violet from "@/assets/bottle-violet.png";
 import blue from "@/assets/bottle-blue.png";
-import { SmokeCanvas, type SmokeHandle } from "@/components/SmokeCanvas";
+import { ThreeSmokeCanvas, type ThreeSmokeHandle } from "@/components/ThreeSmokeCanvas";
 
 type Perfume = { name: string; note: string; color: string; img: string };
 
@@ -38,7 +38,7 @@ function Index() {
   const rotRef = useRef(0);
   const target = useRef(0);
   const drag = useRef<{ last: number; moved: number; vel: number } | null>(null);
-  const smoke = useRef<SmokeHandle | null>(null);
+  const smoke = useRef<ThreeSmokeHandle | null>(null);
   const smokeTimer = useRef<number | null>(null);
   const [size, setSize] = useState({ w: 1000, h: 800 });
 
@@ -212,7 +212,7 @@ function Index() {
         );
       })}
 
-      <SmokeCanvas api={smoke} />
+      <ThreeSmokeCanvas api={smoke} />
 
       <header className="pointer-events-none relative z-40 flex items-center justify-between px-6 py-6 md:px-12">
         <div dir="ltr" className="font-display text-2xl tracking-wide text-[#e8e6f4] md:text-3xl">Maison d'Essence</div>
