@@ -9,19 +9,19 @@ import { SmokeCanvas, type SmokeHandle } from "@/components/SmokeCanvas";
 type Perfume = { name: string; note: string; color: string; img: string };
 
 const PERFUMES: Perfume[] = [
-  { name: "Aurelia", note: "عنبر · وانیل · عود", color: "#e08a3a", img: amber },
-  { name: "Rose Velours", note: "گل رز · مشک · فلفل صورتی", color: "#f08aa6", img: rose },
-  { name: "Elysian", note: "زنبق · بنفشه · چرم", color: "#a86ae0", img: violet },
-  { name: "Ocean Breeze", note: "مرکبات · نمک دریا · وتیور", color: "#5aa6e8", img: blue },
+  { name: "Aurelia", note: "عنبر · وانیل · عود", color: "#a99acb", img: amber },
+  { name: "Rose Velours", note: "گل رز · مشک · فلفل صورتی", color: "#bd8eae", img: rose },
+  { name: "Elysian", note: "زنبق · بنفشه · چرم", color: "#9b8fd0", img: violet },
+  { name: "Ocean Breeze", note: "مرکبات · نمک دریا · وتیور", color: "#879fcb", img: blue },
 ];
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Maison d'Essence — عطرهای لوکس" },
-      { name: "description", content: "سکوی گردان عطرها؛ گنبد شیشه‌ای را باز کنید و دود رایحه را ببینید." },
+      { name: "description", content: "ویترین سینمایی عطرها با سکوی گردان، گنبد شیشه‌ای و مه رایحه." },
       { property: "og:title", content: "Maison d'Essence — عطرهای لوکس" },
-      { property: "og:description", content: "سکوی گردان عطرها با گنبد شیشه‌ای و دود رنگی هر رایحه." },
+      { property: "og:description", content: "ویترین تعاملی عطرها با عمق‌نمایی و دود رنگی." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -39,47 +39,65 @@ function Index() {
   const target = useRef(0);
   const drag = useRef<{ last: number; moved: number; vel: number } | null>(null);
   const smoke = useRef<SmokeHandle | null>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
+  const smokeTimer = useRef<number | null>(null);
   const [size, setSize] = useState({ w: 1000, h: 800 });
 
   useEffect(() => {
-    const on = () => setSize({ w: window.innerWidth, h: window.innerHeight });
-    on();
-    window.addEventListener("resize", on);
+    const onResize = () => setSize({ w: window.innerWidth, h: window.innerHeight });
+    onResize();
+    window.addEventListener("resize", onResize);
     let raf = 0;
-    const loop = () => {
-      if (!drag.current) {
-        rotRef.current += (target.current - rotRef.current) * 0.09;
+    let lastPaint = 0;
+    const loop = (now: number) => {
+      if (!drag.current) rotRef.current += (target.current - rotRef.current) * 0.09;
+      // Keep the smooth motion but avoid forcing a React render on every display frame.
+      if (now - lastPaint > 32) {
+        setRot(rotRef.current);
+        lastPaint = now;
       }
-      setRot(rotRef.current);
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener("resize", on);
+      window.removeEventListener("resize", onResize);
+      if (smokeTimer.current !== null) window.clearTimeout(smokeTimer.current);
     };
   }, []);
 
   const front = ((Math.round(-rotRef.current / STEP) % N) + N) % N;
   const active = PERFUMES[front]!;
-
   const mobile = size.w < 768;
   const R = mobile ? size.w * 0.36 : Math.min(size.w * 0.26, 380);
-  const tilt = 0.28; // ellipse squash
+  const tilt = 0.28;
   const cx = mobile ? size.w / 2 : size.w * 0.42;
   const cy = size.h * (mobile ? 0.6 : 0.62);
   const bottleH = mobile ? size.h * 0.3 : size.h * 0.42;
 
   const closeDome = () => {
+    if (smokeTimer.current !== null) {
+      window.clearTimeout(smokeTimer.current);
+      smokeTimer.current = null;
+    }
     setOpen(null);
     smoke.current?.stop();
   };
 
   const openDome = (i: number) => {
+    if (smokeTimer.current !== null) window.clearTimeout(smokeTimer.current);
     setOpen(i);
-    // emit from the bottle base after the dome starts lifting
-    setTimeout(() => smoke.current?.burst(cx, cy + R * tilt - bottleH * 0.18, PERFUMES[i]!.color), 250);
+    const angle = i * STEP + rotRef.current;
+    const depth = Math.cos(angle);
+    const bottleX = cx + Math.sin(angle) * R;
+    const bottleY = cy + depth * R * tilt;
+    const scale = 0.55 + 0.45 * ((depth + 1) / 2);
+    const height = bottleH * scale;
+    // Transparent PNG canvas ends below the visible glass; this anchor targets its atomizer.
+    const atomizerY = bottleY - height * 0.92 + height * 0.19;
+    smokeTimer.current = window.setTimeout(() => {
+      smoke.current?.burst(bottleX, atomizerY, PERFUMES[i]!.color);
+      smokeTimer.current = null;
+    }, 520);
   };
 
   const tap = (i: number) => {
@@ -98,7 +116,6 @@ function Index() {
   return (
     <main
       dir="rtl"
-      ref={stageRef}
       className="relative h-[100svh] w-full touch-none select-none overflow-hidden bg-background text-foreground"
       onPointerDown={(e) => {
         drag.current = { last: e.clientX, moved: 0, vel: 0 };
@@ -118,48 +135,48 @@ function Index() {
         const d = drag.current;
         if (!d) return;
         target.current = Math.round((rotRef.current + d.vel * 10) / STEP) * STEP;
-        drag.current = d.moved > 8 ? null : null;
+        drag.current = null;
       }}
       onPointerCancel={() => (drag.current = null)}
     >
-      {/* spotlight */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_40%_70%_at_42%_0%,var(--glow),transparent_70%)]" />
+      <div className="fashion-backdrop pointer-events-none absolute inset-0" />
+      <div className="fashion-grain pointer-events-none absolute inset-0" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_42%_55%_at_42%_0%,var(--glow),transparent_72%)]" />
       <div
-        className="pointer-events-none absolute inset-0 opacity-60 transition-[background] duration-700"
-        style={{ background: `radial-gradient(ellipse 35% 30% at ${(cx / size.w) * 100}% ${(cy / size.h) * 100}%, ${active.color}22, transparent 70%)` }}
+        className="pointer-events-none absolute inset-0 opacity-50 transition-[background] duration-1000"
+        style={{ background: `radial-gradient(ellipse 34% 34% at ${(cx / size.w) * 100}% ${(cy / size.h) * 100}%, ${active.color}20, transparent 72%)` }}
       />
 
-      {/* turntable */}
+      <div className="pointer-events-none absolute left-[-18%] top-[16%] h-[58vh] w-[52vw] rounded-full bg-violet-400/5 blur-[100px]" />
+      <div className="pointer-events-none absolute right-[-16%] bottom-[-22%] h-[55vh] w-[48vw] rounded-full bg-indigo-300/5 blur-[110px]" />
+
+      {/* Turntable: layered elliptical geometry with a cool violet edge light. */}
       <div
         className="pointer-events-none absolute"
         style={{ left: cx - R * 1.45, top: cy - R * 1.45 * tilt, width: R * 2.9, height: R * 2.9 * tilt + 46 }}
       >
-        {/* side wall */}
-        <div className="absolute inset-x-0 bottom-0 top-[18px] rounded-[50%] bg-[linear-gradient(90deg,var(--stone-dark),var(--stone)_45%,var(--stone-dark))]" />
-        <div className="absolute inset-x-0 bottom-[2px] h-[calc(100%-46px)] rounded-[50%] border-b-2 border-gold" />
-        {/* top face */}
-        <div className="absolute inset-x-0 top-0 overflow-hidden rounded-[50%] border border-gold/70" style={{ height: R * 2.9 * tilt }}>
+        <div className="absolute inset-x-0 bottom-0 top-[18px] rounded-[50%] bg-[linear-gradient(90deg,var(--stone-dark),var(--stone)_45%,var(--stone-dark))] shadow-[0_24px_65px_rgba(0,0,0,.6)]" />
+        <div className="absolute inset-x-0 bottom-[2px] h-[calc(100%-46px)] rounded-[50%] border-b-2 border-[var(--gold)] shadow-[0_8px_22px_var(--glow)]" />
+        <div className="absolute inset-x-0 top-0 overflow-hidden rounded-[50%] border border-[var(--gold)]/70" style={{ height: R * 2.9 * tilt }}>
           <div
             className="absolute left-1/2 top-1/2 aspect-square w-full"
             style={{
               transform: `translate(-50%,-50%) scaleY(${tilt}) rotate(${(rot * 180) / Math.PI}deg)`,
-              background:
-                "radial-gradient(circle at 50% 50%, transparent 0 40%, var(--stone-dark) 100%), repeating-conic-gradient(from 10deg, var(--stone) 0deg 7deg, var(--stone-vein) 7.5deg 8deg, var(--stone) 8.5deg 23deg), var(--stone)",
+              background: "radial-gradient(circle at 50% 50%, transparent 0 40%, var(--stone-dark) 100%), repeating-conic-gradient(from 10deg, var(--stone) 0deg 7deg, var(--stone-vein) 7.5deg 8deg, var(--stone) 8.5deg 23deg), var(--stone)",
             }}
           />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_60%_at_45%_20%,var(--sheen),transparent_70%)]" />
         </div>
       </div>
 
-      {/* bottles */}
       {PERFUMES.map((p, i) => {
-        const a = i * STEP + rot;
-        const depth = Math.cos(a); // 1 = front
-        const x = cx + Math.sin(a) * R;
+        const angle = i * STEP + rot;
+        const depth = Math.cos(angle);
+        const x = cx + Math.sin(angle) * R;
         const y = cy + depth * R * tilt;
-        const s = 0.55 + 0.45 * ((depth + 1) / 2);
+        const scale = 0.55 + 0.45 * ((depth + 1) / 2);
         const isOpen = open === i;
-        const h = bottleH * s;
+        const h = bottleH * scale;
         const w = h * 0.75;
         return (
           <div
@@ -177,21 +194,16 @@ function Index() {
               width={768}
               height={1024}
               draggable={false}
-              className="relative z-10 h-full w-full cursor-pointer object-contain drop-shadow-[0_20px_25px_var(--shadow-deep)]"
-              style={{ filter: `brightness(${0.45 + 0.55 * ((depth + 1) / 2)})` }}
+              className="relative z-10 h-full w-full cursor-pointer object-contain drop-shadow-[0_24px_32px_var(--shadow-deep)]"
+              style={{ filter: `brightness(${0.45 + 0.55 * ((depth + 1) / 2)}) saturate(.88)` }}
             />
-            {/* trapped smoke inside the dome */}
             <div
-              className="pointer-events-none absolute inset-x-[12%] bottom-[18%] z-20 h-[35%] rounded-[50%] blur-xl transition-opacity duration-700"
-              style={{ background: `radial-gradient(ellipse at 50% 80%, ${p.color}aa, transparent 70%)`, opacity: isOpen ? 0 : 0.55 + 0.3 * depth }}
+              className="pointer-events-none absolute inset-x-[12%] bottom-[18%] z-20 h-[35%] rounded-[50%] blur-2xl transition-opacity duration-700"
+              style={{ background: `radial-gradient(ellipse at 50% 80%, ${p.color}66, transparent 72%)`, opacity: isOpen ? 0 : 0.38 + 0.2 * depth }}
             />
-            {/* glass dome */}
             <div
-              className="pointer-events-none absolute inset-x-[4%] bottom-[9%] top-[-6%] z-20 transition-[transform,opacity] duration-[1400ms] ease-[cubic-bezier(.3,.7,.2,1)]"
-              style={{
-                transform: isOpen ? "translate(-8%, -85%) rotate(-14deg)" : "none",
-                opacity: isOpen ? 0 : 1,
-              }}
+              className="pointer-events-none absolute inset-x-[4%] bottom-[9%] top-[-6%] z-20 transition-[transform,opacity] duration-[1500ms] ease-[cubic-bezier(.3,.7,.2,1)]"
+              style={{ transform: isOpen ? "translate(-8%, -88%) rotate(-15deg)" : "none", opacity: isOpen ? 0 : 1 }}
             >
               <div className="glass-dome absolute inset-0 rounded-t-[50%_38%] rounded-b-[6%]" />
               <div className="absolute -top-[5%] left-1/2 h-[7%] w-[11%] -translate-x-1/2 rounded-full glass-knob" />
@@ -203,15 +215,13 @@ function Index() {
       <SmokeCanvas api={smoke} />
 
       <header className="pointer-events-none relative z-40 flex items-center justify-between px-6 py-6 md:px-12">
-        <div dir="ltr" className="font-display text-2xl tracking-wide md:text-3xl">
-          Maison d'Essence
-        </div>
-        <span className="text-xs tracking-[0.3em] text-muted-foreground">پرفیوم بوتیک</span>
+        <div dir="ltr" className="font-display text-2xl tracking-wide text-[#e8e6f4] md:text-3xl">Maison d'Essence</div>
+        <span className="text-xs tracking-[0.3em] text-[#aaa8c5]">پرفیوم بوتیک</span>
       </header>
 
       <div className="pointer-events-none absolute right-6 top-24 z-40 max-w-xs md:right-12 md:top-1/3">
         <p className="mb-3 text-xs tracking-[0.3em] text-primary">سفر یک رایحه</p>
-        <h1 dir="ltr" key={active.name} className="animate-in fade-in slide-in-from-bottom-2 text-right font-display text-4xl leading-tight duration-500 md:text-7xl">
+        <h1 dir="ltr" key={active.name} className="animate-in fade-in slide-in-from-bottom-2 text-right font-display text-4xl leading-tight text-[#f1effa] duration-500 md:text-7xl">
           {active.name}
         </h1>
         <p className="mt-3 text-sm text-muted-foreground">{active.note}</p>
