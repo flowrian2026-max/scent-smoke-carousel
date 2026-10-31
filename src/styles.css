@@ -74,7 +74,8 @@
   --input: oklch(0.78 0.05 285 / 20%);
   --ring: oklch(0.68 0.075 282);
   --glow: oklch(0.48 0.09 285 / 34%);
-  --silver: oklch(0.88 0.018 265);\n  --gold: var(--silver);
+  --silver: oklch(0.88 0.018 265);
+  --gold: var(--silver);
   --stone: oklch(0.22 0.035 278);
   --stone-dark: oklch(0.12 0.03 270);
   --stone-vein: oklch(0.48 0.06 285 / 55%);
