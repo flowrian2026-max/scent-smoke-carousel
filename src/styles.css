@@ -405,12 +405,14 @@
   animation: curtain-part-right 2.8s cubic-bezier(.78, 0, .18, 1) .85s forwards;
 }
 @keyframes curtain-part-left {
-  from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(-101%, 0, 0); }
+  from { transform: translate3d(0, 0, 0) scaleX(1); }
+  72% { transform: translate3d(-76%, 0, 0) scaleX(.94); }
+  86%, 100% { transform: translate3d(-78%, 0, 0) scaleX(.92); }
 }
 @keyframes curtain-part-right {
-  from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(101%, 0, 0); }
+  from { transform: translate3d(0, 0, 0) scaleX(1); }
+  72% { transform: translate3d(76%, 0, 0) scaleX(.94); }
+  86%, 100% { transform: translate3d(78%, 0, 0) scaleX(.92); }
 }
 @media (prefers-reduced-motion: reduce) {
   .curtain-panel-left { animation-duration: .01ms; }
