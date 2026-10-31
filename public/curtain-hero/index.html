@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090e1c">
+<title>SCENT SCRIBE — The Private Fragrance Gallery</title>
+<style>
+:root{--night:#080c18;--navy:#0a1123;--plum:#211a29;--silver:#d4dced;--silver-dim:#8d9ab5;--lav:#8589c8;--white:#f0f2f8}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--night);color:var(--white)}
+body{font-family:Georgia,"Times New Roman",serif;overflow:hidden}
+button{font:inherit}
+.scene{height:100svh;min-height:620px;position:relative;isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 50% 72%,#25243b 0%,#121a2b 36%,#080c18 77%)}
+.backdrop{position:absolute;inset:0;z-index:0;overflow:hidden;background:
+radial-gradient(ellipse at 15% 24%,rgba(102,120,166,.15),transparent 32%),
+radial-gradient(ellipse at 85% 32%,rgba(112,84,135,.14),transparent 33%),
+linear-gradient(110deg,#080d1b,#171a2d 48%,#090e1b)}
+.backdrop:before,.backdrop:after{content:"";position:absolute;inset:-25%;pointer-events:none;filter:blur(34px);background:linear-gradient(112deg,transparent 37%,rgba(201,213,238,.08) 47%,transparent 56%);transform:translateX(-22%) rotate(-8deg);animation:lightSweep 17s ease-in-out infinite alternate}
+.backdrop:after{transform:translateX(24%) rotate(9deg);opacity:.6;animation-delay:-8s}
+@keyframes lightSweep{to{transform:translateX(27%) rotate(7deg)}}
+.ambient-video,.smoke-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.ambient-video{z-index:0;opacity:.6;mix-blend-mode:screen}
+.smoke-video{z-index:1;opacity:.55;mix-blend-mode:screen;mask-image:linear-gradient(transparent,#000 12%,#000 90%,transparent)}
+/* Add real footage later with data-video-src on each video element.
+   Keep the environment video and smoke video as independent layers. */
+.halo{position:absolute;z-index:1;left:50%;top:55%;width:min(76vw,1000px);height:min(34vw,430px);transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(135,144,190,.13),transparent 67%);filter:blur(20px);pointer-events:none}
+.topbar{position:absolute;z-index:6;top:0;left:0;right:0;padding:28px clamp(20px,5vw,76px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(200,211,233,.1)}
+.wordmark{font-size:17px;letter-spacing:.34em;color:#e6eaf4;white-space:nowrap}
+.wordmark span{display:block;margin-top:6px;font:8px/1.3 Arial,sans-serif;letter-spacing:.45em;color:#8994b1}
+.nav{display:flex;gap:30px;font:9px Arial,sans-serif;letter-spacing:.23em;color:#a7b0c6}
+.nav a{color:inherit;text-decoration:none}
+.top-index{font:9px Arial,sans-serif;letter-spacing:.2em;color:#98a2bd}
+.hero-copy{position:absolute;z-index:2;top:18%;left:50%;transform:translateX(-50%);width:min(88%,800px);text-align:center;opacity:0;transition:opacity 1.2s .9s}
+.scene.open .hero-copy{opacity:1}
+.kicker{font:9px Arial,sans-serif;letter-spacing:.46em;color:#a7b3d0;text-transform:uppercase}
+.hero-copy h1{font-size:clamp(37px,5.7vw,78px);font-weight:400;line-height:.98;letter-spacing:.095em;margin:17px 0 13px;text-shadow:0 6px 38px #03050b}
+.hero-copy p{margin:0;font:10px Arial,sans-serif;letter-spacing:.27em;color:#a9b2c8}
+.gallery{position:absolute;z-index:3;inset:0;display:flex;align-items:flex-end;justify-content:center;gap:clamp(10px,6vw,82px);padding:0 5vw clamp(48px,9vh,92px);opacity:0;transform:translateY(28px);transition:opacity 1.5s 1s,transform 1.65s 1s}
+.scene.open .gallery{opacity:1;transform:translateY(0)}
+.product{width:clamp(115px,17vw,220px);position:relative;text-align:center;cursor:pointer;outline:none;transition:transform .55s cubic-bezier(.2,.75,.2,1);filter:drop-shadow(0 20px 24px rgba(0,0,0,.45))}
+.product:hover,.product:focus-visible{transform:translateY(-13px)}
+.product:nth-child(2){transform:translateY(-26px)}
+.product:nth-child(2):hover,.product:nth-child(2):focus-visible{transform:translateY(-39px)}
+.bottle-wrap{height:clamp(178px,26vw,312px);display:flex;align-items:flex-end;justify-content:center;position:relative}
+.bottle-svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 5px 16px rgba(170,189,224,.16))}
+.orbit{position:absolute;z-index:-1;bottom:13px;width:92%;height:46px;border:1px solid rgba(208,220,243,.45);border-radius:50%;transform:rotateX(67deg);box-shadow:0 0 20px rgba(151,173,220,.15),inset 0 0 15px rgba(183,196,225,.08)}
+.plinth{position:relative;height:14px;width:100%;border-radius:50%;border:1px solid rgba(215,224,242,.64);background:linear-gradient(180deg,#667087 0%,#212a3d 37%,#080d1a 100%);box-shadow:0 9px 25px #02040b,inset 0 1px 3px rgba(255,255,255,.38)}
+.plinth:before{content:"";position:absolute;left:8%;right:8%;top:-4px;height:4px;border-radius:50%;background:linear-gradient(90deg,transparent,#aab7d0 21%,#f0f3fa 49%,#8794ae 78%,transparent);box-shadow:0 0 12px rgba(207,219,241,.6)}
+.plinth:after{content:"";position:absolute;left:24%;right:24%;top:11px;height:27px;background:linear-gradient(90deg,#0a1020,#333c51 50%,#0a1020);clip-path:polygon(8% 0,92% 0,100% 100%,0 100%);border-bottom:1px solid #7f8ca7}
+.product-name{margin-top:21px;font-size:11px;letter-spacing:.25em;color:#e4e9f4}
+.product-sub{margin-top:7px;font:8px Arial,sans-serif;letter-spacing:.2em;color:#919db9}
+.scene-rule{position:absolute;z-index:2;left:clamp(20px,5vw,76px);bottom:clamp(30px,5vh,58px);font:8px Arial,sans-serif;letter-spacing:.27em;color:#818da9;writing-mode:vertical-rl}
+.curtains{position:absolute;inset:0;z-index:5;display:flex;pointer-events:none}
+.panel{width:50%;height:100%;position:relative;overflow:hidden;transition:transform 2.65s cubic-bezier(.78,0,.18,1)}
+.panel.left{transform-origin:left center}.panel.right{transform-origin:right center}
+.velvet{position:absolute;inset:0;background:
+repeating-linear-gradient(90deg,rgba(0,0,0,.72) 0 3.5%,rgba(87,81,113,.28) 5.5%,rgba(4,7,16,.67) 9.5%,rgba(42,39,62,.18) 12%),
+linear-gradient(90deg,#060914 0%,#1b1a2b 23%,#0d1222 62%,#070b17 100%);
+box-shadow:inset 0 0 100px 30px #02040b,0 0 40px #02040b}
+.panel.left .velvet{border-right:1px solid rgba(202,213,237,.22)}
+.panel.right .velvet{border-left:1px solid rgba(202,213,237,.22)}
+.panel:after{content:"";position:absolute;top:0;bottom:0;width:1px;opacity:.48;background:linear-gradient(transparent,rgba(205,216,237,.7),transparent)}
+.panel.left:after{right:10%}.panel.right:after{left:10%}
+.scene.open .panel.left{transform:translateX(-101%)}
+.scene.open .panel.right{transform:translateX(101%)}
+.seam{position:absolute;z-index:6;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(transparent,rgba(210,222,244,.52),transparent);transition:opacity .4s}
+.scene.open .seam{opacity:0}
+.detail{position:absolute;z-index:8;right:clamp(16px,4vw,56px);bottom:clamp(22px,5vh,52px);width:min(310px,calc(100vw - 32px));padding:20px 22px 19px;background:linear-gradient(135deg,rgba(26,34,54,.85),rgba(10,15,29,.84));border:1px solid rgba(199,211,234,.3);backdrop-filter:blur(20px);box-shadow:0 18px 60px rgba(0,0,0,.45);opacity:0;transform:translateY(14px);pointer-events:none;transition:.45s}
+.detail.visible{opacity:1;transform:none;pointer-events:auto}
+.detail-close{position:absolute;top:8px;left:12px;border:0;background:none;color:#c8d0e2;font-size:20px;cursor:pointer}
+.detail .micro{font:8px Arial,sans-serif;letter-spacing:.33em;color:#9eabc9}
+.detail h2{font-size:22px;font-weight:400;letter-spacing:.1em;margin:10px 0}
+.detail p{font:11px/1.75 Arial,sans-serif;color:#b7c0d4;margin:0}
+.detail a{display:inline-block;margin-top:13px;color:#d8dfed;text-decoration:none;font:8px Arial,sans-serif;letter-spacing:.22em;border-bottom:1px solid rgba(216,223,237,.45);padding-bottom:5px}
+.controls{position:absolute;z-index:7;left:50%;bottom:21px;transform:translateX(-50%);display:flex;gap:9px;white-space:nowrap}
+.controls button{padding:9px 15px;border-radius:40px;border:1px solid rgba(196,209,234,.32);background:rgba(8,13,25,.56);color:#d5ddec;font:8px Arial,sans-serif;letter-spacing:.2em;backdrop-filter:blur(12px);cursor:pointer;transition:background .25s,border-color .25s}
+.controls button:hover{background:rgba(128,137,194,.17);border-color:rgba(210,221,241,.6)}
+.start-note{position:absolute;z-index:6;bottom:76px;left:50%;transform:translateX(-50%);font:8px Arial,sans-serif;letter-spacing:.35em;color:#a6b0c6;white-space:nowrap;transition:opacity .4s}
+.scene.open .start-note{opacity:0}
+.grain{position:absolute;inset:0;z-index:9;pointer-events:none;opacity:.07;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.3'/%3E%3C/svg%3E")}
+@media(max-width:680px){
+ body{overflow:hidden}.scene{min-height:560px}
+ .topbar{padding:19px 17px}.wordmark{font-size:13px;letter-spacing:.28em}.nav{display:none}.top-index{font-size:8px}
+ .hero-copy{top:16%;width:94%}.hero-copy h1{font-size:clamp(32px,9vw,46px);letter-spacing:.06em;margin:14px 0}.hero-copy p{font-size:8px;letter-spacing:.15em;line-height:1.7}
+ .gallery{gap:7px;padding:0 3vw 17vh}.product{width:31vw}.product:nth-child(2){transform:translateY(-16px)}.product:nth-child(2):hover{transform:translateY(-26px)}
+ .bottle-wrap{height:clamp(156px,39vh,220px)}.product-name{font-size:8px;letter-spacing:.15em;margin-top:16px}.product-sub{font-size:7px;letter-spacing:.08em}.plinth{height:11px}.plinth:after{top:9px;height:20px}
+ .scene-rule{display:none}.detail{right:12px;bottom:58px;width:calc(100vw - 24px);padding:17px 18px}.detail h2{font-size:19px}
+ .controls{bottom:12px}.controls button{padding:8px 11px;font-size:7px}.start-note{bottom:57px;font-size:7px;letter-spacing:.18em}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="scene" id="scene">
+  <div class="backdrop" aria-hidden="true"></div>
+  <video class="ambient-video" id="ambientVideo" muted autoplay loop playsinline data-video-src=""></video>
+  <video class="smoke-video" id="smokeVideo" muted autoplay loop playsinline data-video-src=""></video>
+  <div class="halo" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="wordmark">SCENT SCRIBE<span>THE PRIVATE FRAGRANCE GALLERY</span></div>
+    <nav class="nav"><a href="#gallery">COLLECTION</a><a href="#gallery">THE ATELIER</a><a href="#gallery">DISCOVER</a></nav>
+    <div class="top-index">EXHIBITION 01 / 03</div>
+  </header>
+
+  <section class="hero-copy">
+    <div class="kicker">A STUDY IN FRAGRANCE</div>
+    <h1>BEYOND THE SCENT</h1>
+    <p>THREE DISTINCT WORLDS. ONE UNFORGETTABLE IMPRESSION.</p>
+  </section>
+
+  <div class="scene-rule">SCENT · FORM · ATMOSPHERE</div>
+
+  <section class="gallery" id="gallery" aria-label="Fragrance collection">
+    <article class="product" tabindex="0" role="button" aria-label="Discover Nocturne"
+      data-name="NOCTURNE" data-notes="BLACK IRIS · SMOKED CEDAR · MUSK"
+      data-description="A deep, architectural composition with a quiet and magnetic trail.">
+      <div class="bottle-wrap">
+        <svg class="bottle-svg" viewBox="0 0 180 280" role="img" aria-label="Dark glass perfume bottle">
+          <defs>
+            <linearGradient id="glassA" x1="0" x2="1"><stop stop-color="#dae4f5" stop-opacity=".72"/><stop offset=".16" stop-color="#64738e" stop-opacity=".22"/><stop offset=".62" stop-color="#111a2d" stop-opacity=".92"/><stop offset=".88" stop-color="#d7e0f0" stop-opacity=".2"/><stop offset="1" stop-color="#f5f7fc" stop-opacity=".58"/></linearGradient>
+            <linearGradient id="metalA" x1="0" x2="1"><stop stop-color="#536078"/><stop offset=".45" stop-color="#f0f3fb"/><stop offset=".7" stop-color="#7c8aa5"/><stop offset="1" stop-color="#dce4f2"/></linearGradient>
+          </defs>
+          <ellipse cx="90" cy="257" rx="48" ry="9" fill="#aab8d3" opacity=".13"/>
+          <rect x="73" y="24" width="34" height="38" rx="3" fill="url(#metalA)" stroke="#d8e0ef" stroke-opacity=".5"/>
+          <rect x="77" y="17" width="26" height="8" rx="2" fill="#8794ab"/>
+          <path d="M53 62 Q53 52 64 52 H116 Q127 52 127 62 V227 Q127 245 110 248 H70 Q53 245 53 227Z" fill="url(#glassA)" stroke="#e0e8f5" stroke-opacity=".72" stroke-width="1.3"/>
+          <path d="M60 73 Q60 61 72 61 H108" stroke="#fff" stroke-opacity=".45" fill="none"/>
+          <path d="M60 83 V221 Q60 237 76 239" stroke="#fff" stroke-opacity=".26" fill="none" stroke-width="2"/>
+          <rect x="64" y="128" width="52" height="54" rx="1" fill="#141b2d" fill-opacity=".8" stroke="#aebbd1" stroke-opacity=".55"/>
+          <text x="90" y="149" fill="#edf1f8" text-anchor="middle" font-size="8" letter-spacing="2">SCENT</text>
+          <text x="90" y="163" fill="#edf1f8" text-anchor="middle" font-size="8" letter-spacing="2">SCRIBE</text>
+          <path d="M70 172 H110" stroke="#aab7d0" stroke-opacity=".65"/>
+        </svg>
+        <div class="orbit"></div>
+      </div>
+      <div class="plinth"></div><div class="product-name">NOCTURNE</div><div class="product-sub">EAU DE PARFUM · 100 ML</div>
+    </article>
+
+    <article class="product" tabindex="0" role="button" aria-label="Discover Velvet Haze"
+      data-name="VELVET HAZE" data-notes="DARK ROSE · VIOLET · CASHMERE WOOD"
+      data-description="A soft floral heart wrapped in an elegant, cool and velvety finish.">
+      <div class="bottle-wrap">
+        <svg class="bottle-svg" viewBox="0 0 180 280" role="img" aria-label="Sculpted plum perfume bottle">
+          <defs>
+            <linearGradient id="glassB" x1="0" x2="1"><stop stop-color="#e4d9ef" stop-opacity=".65"/><stop offset=".2" stop-color="#806b91" stop-opacity=".35"/><stop offset=".62" stop-color="#241b32" stop-opacity=".96"/><stop offset=".88" stop-color="#b9a9cc" stop-opacity=".24"/><stop offset="1" stop-color="#edf0f8" stop-opacity=".5"/></linearGradient>
+            <linearGradient id="metalB" x1="0" x2="1"><stop stop-color="#65718a"/><stop offset=".5" stop-color="#f3f5fb"/><stop offset="1" stop-color="#8793a9"/></linearGradient>
+          </defs>
+          <ellipse cx="90" cy="258" rx="51" ry="9" fill="#b2a8cb" opacity=".15"/>
+          <rect x="72" y="22" width="36" height="33" rx="4" fill="url(#metalB)" stroke="#e2e6f0" stroke-opacity=".7"/>
+          <path d="M55 63 Q55 54 70 54 H110 Q125 54 125 63 L132 217 Q133 244 106 248 H74 Q47 244 48 217Z" fill="url(#glassB)" stroke="#e1e5f1" stroke-opacity=".72" stroke-width="1.3"/>
+          <path d="M63 75 Q68 61 80 61 H100" stroke="#fff" stroke-opacity=".4" fill="none" stroke-width="2"/>
+          <path d="M60 90 L60 215 Q61 235 78 238" stroke="#fff" stroke-opacity=".22" fill="none" stroke-width="2"/>
+          <rect x="63" y="130" width="54" height="53" fill="#21192b" fill-opacity=".8" stroke="#b6a9c8" stroke-opacity=".6"/>
+          <text x="90" y="151" fill="#f0edf5" text-anchor="middle" font-size="8" letter-spacing="1.6">SCENT</text>
+          <text x="90" y="165" fill="#f0edf5" text-anchor="middle" font-size="8" letter-spacing="1.6">SCRIBE</text>
+          <path d="M70 173 H110" stroke="#c4bbd1" stroke-opacity=".55"/>
+        </svg>
+        <div class="orbit"></div>
+      </div>
+      <div class="plinth"></div><div class="product-name">VELVET HAZE</div><div class="product-sub">EAU DE PARFUM · 75 ML</div>
+    </article>
+
+    <article class="product" tabindex="0" role="button" aria-label="Discover Afterlight"
+      data-name="AFTERLIGHT" data-notes="BERGAMOT · MINERAL AIR · PALE CEDAR"
+      data-description="A bright mineral opening balanced by a refined, transparent woody base.">
+      <div class="bottle-wrap">
+        <svg class="bottle-svg" viewBox="0 0 180 280" role="img" aria-label="Clear crystal perfume bottle">
+          <defs>
+            <linearGradient id="glassC" x1="0" x2="1"><stop stop-color="#e7f0fc" stop-opacity=".7"/><stop offset=".2" stop-color="#94a8c4" stop-opacity=".28"/><stop offset=".58" stop-color="#172237" stop-opacity=".78"/><stop offset=".85" stop-color="#d9e4f5" stop-opacity=".27"/><stop offset="1" stop-color="#fff" stop-opacity=".62"/></linearGradient>
+            <linearGradient id="metalC" x1="0" x2="1"><stop stop-color="#68758d"/><stop offset=".5" stop-color="#f4f6fc"/><stop offset="1" stop-color="#8492ad"/></linearGradient>
+          </defs>
+          <ellipse cx="90" cy="257" rx="49" ry="8" fill="#b7c9e6" opacity=".16"/>
+          <rect x="75" y="27" width="30" height="34" rx="2" fill="url(#metalC)" stroke="#e8edf6" stroke-opacity=".6"/>
+          <rect x="69" y="57" width="42" height="9" rx="1" fill="#9ba9c1" stroke="#e4eaf5" stroke-opacity=".45"/>
+          <path d="M52 75 Q52 67 63 67 H117 Q128 67 128 75 V222 Q128 245 107 247 H73 Q52 245 52 222Z" fill="url(#glassC)" stroke="#e5ecf8" stroke-opacity=".75" stroke-width="1.4"/>
+          <path d="M59 84 V220 Q60 236 77 239" stroke="#fff" stroke-opacity=".4" stroke-width="2" fill="none"/>
+          <path d="M120 83 V216" stroke="#dfe9f8" stroke-opacity=".34" stroke-width="2"/>
+          <rect x="64" y="135" width="52" height="47" fill="#101b2e" fill-opacity=".8" stroke="#becbe1" stroke-opacity=".62"/>
+          <text x="90" y="154" fill="#eff3fa" text-anchor="middle" font-size="8" letter-spacing="1.5">SCENT</text>
+          <text x="90" y="168" fill="#eff3fa" text-anchor="middle" font-size="8" letter-spacing="1.5">SCRIBE</text>
+          <path d="M72 174 H108" stroke="#c2cee1" stroke-opacity=".58"/>
+        </svg>
+        <div class="orbit"></div>
+      </div>
+      <div class="plinth"></div><div class="product-name">AFTERLIGHT</div><div class="product-sub">EAU DE PARFUM · 100 ML</div>
+    </article>
+  </section>
+
+  <div class="start-note">THE FRAGRANCE GALLERY IS ABOUT TO OPEN</div>
+  <div class="curtains" aria-hidden="true"><div class="panel left"><div class="velvet"></div></div><div class="panel right"><div class="velvet"></div></div></div>
+  <div class="seam" aria-hidden="true"></div>
+
+  <aside class="detail" id="detail" aria-live="polite">
+    <button class="detail-close" id="detailClose" aria-label="Close product details">×</button>
+    <div class="micro">FRAGRANCE PROFILE</div>
+    <h2 id="detailName">NOCTURNE</h2>
+    <p id="detailNotes"></p>
+    <p id="detailDescription" style="margin-top:8px"></p>
+    <a href="#gallery" id="detailLink">EXPLORE FRAGRANCE ↗</a>
+  </aside>
+
+  <div class="controls">
+    <button id="replay">REPLAY CURTAIN</button>
+    <button id="skip">ENTER GALLERY</button>
+  </div>
+  <div class="grain" aria-hidden="true"></div>
+</main>
+<script>
+(() => {
+  const scene = document.getElementById('scene');
+  const detail = document.getElementById('detail');
+  let revealTimer;
+  const ambient = document.getElementById('ambientVideo');
+  const smoke = document.getElementById('smokeVideo');
+  // Real footage can be connected independently by filling data-video-src.
+  [ambient, smoke].forEach(video => {
+    const src = video.dataset.videoSrc;
+    if (src) { video.src = src; video.load(); video.play().catch(() => {}); }
+  });
+  function replay() {
+    window.clearTimeout(revealTimer);
+    detail.classList.remove('visible');
+    scene.classList.remove('open');
+    revealTimer = window.setTimeout(() => scene.classList.add('open'), 500);
+  }
+  function enter() {
+    window.clearTimeout(revealTimer);
+    scene.classList.add('open');
+  }
+  document.getElementById('replay').addEventListener('click', replay);
+  document.getElementById('skip').addEventListener('click', enter);
+  const items = document.querySelectorAll('.product');
+  items.forEach(item => {
+    const show = () => {
+      document.getElementById('detailName').textContent = item.dataset.name;
+      document.getElementById('detailNotes').textContent = item.dataset.notes;
+      document.getElementById('detailDescription').textContent = item.dataset.description;
+      detail.classList.add('visible');
+    };
+    item.addEventListener('click', show);
+    item.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); show(); }
+    });
+  });
+  document.getElementById('detailClose').addEventListener('click', () => detail.classList.remove('visible'));
+  replay();
+})();
+</script>
+</body>
+</html>
