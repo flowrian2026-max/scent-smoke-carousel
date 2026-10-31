@@ -252,3 +252,96 @@
   background: radial-gradient(circle at 32% 26%, rgba(247,249,255,.42), rgba(132,145,173,.12) 48%, rgba(20,24,42,.5));
   box-shadow: inset 0 1px 2px rgba(255,255,255,.35), 0 0 12px rgba(180,194,222,.16);
 }
+
+
+/* Three-dimensional curved exhibition set: a recessed architectural arch
+   with curved side returns and a continuous perspective floor. */
+.fashion-backdrop { z-index: 0; }
+.stage-depth {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  perspective: 1150px;
+  perspective-origin: 50% 43%;
+  transform-style: preserve-3d;
+}
+.stage-arch {
+  position: absolute;
+  left: 50%;
+  top: -17%;
+  width: min(88vw, 1160px);
+  height: 105%;
+  transform: translateX(-50%) translateZ(-105px);
+  transform-style: preserve-3d;
+  border: 1px solid rgba(190, 190, 226, .13);
+  border-bottom: 0;
+  border-radius: 50% 50% 0 0 / 34% 34% 0 0;
+  background:
+    radial-gradient(ellipse 62% 58% at 50% 34%, rgba(105, 96, 151, .17), transparent 78%),
+    linear-gradient(90deg, rgba(3, 6, 17, .9), rgba(20, 21, 42, .52) 18%, rgba(22, 22, 42, .16) 50%, rgba(20, 21, 42, .52) 82%, rgba(3, 6, 17, .9)),
+    linear-gradient(180deg, #101326 0%, #151629 48%, rgba(10, 13, 26, .12) 100%);
+  box-shadow:
+    inset 34px 0 54px rgba(2, 4, 13, .54),
+    inset -34px 0 54px rgba(2, 4, 13, .54),
+    0 0 90px rgba(116, 105, 166, .09);
+}
+.stage-arch::before {
+  content: "";
+  position: absolute;
+  inset: 3.2% 3.2% 0;
+  border: 1px solid rgba(199, 195, 230, .075);
+  border-bottom: 0;
+  border-radius: 50% 50% 0 0 / 34% 34% 0 0;
+  box-shadow: inset 0 0 70px rgba(131, 121, 187, .07);
+}
+.stage-arch::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 7%;
+  width: 54%;
+  height: 56%;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 45% 45% / 42% 42% 28% 28%;
+  background: radial-gradient(ellipse, rgba(142, 132, 194, .12), rgba(64, 62, 105, .035) 48%, transparent 72%);
+  filter: blur(18px);
+}
+.stage-arch-inner {
+  position: absolute;
+  inset: 0 8% 0;
+  border-left: 1px solid rgba(194, 188, 225, .055);
+  border-right: 1px solid rgba(194, 188, 225, .055);
+  border-radius: 50% 50% 0 0 / 34% 34% 0 0;
+  background: linear-gradient(90deg, rgba(3, 5, 15, .28), transparent 18% 82%, rgba(3, 5, 15, .28));
+}
+.stage-floor {
+  position: absolute;
+  left: -18%;
+  bottom: -43%;
+  width: 136%;
+  height: 78%;
+  transform: rotateX(69deg) translateZ(-8px);
+  transform-origin: center top;
+  border-radius: 50% 50% 0 0;
+  background:
+    radial-gradient(ellipse 48% 30% at 50% 5%, rgba(148, 137, 198, .2), transparent 76%),
+    repeating-linear-gradient(90deg, transparent 0 13.8%, rgba(187, 181, 222, .035) 14%, transparent 14.2% 27.8%),
+    linear-gradient(180deg, rgba(36, 34, 59, .62), rgba(7, 9, 19, .98));
+  border-top: 1px solid rgba(204, 198, 232, .17);
+  box-shadow: 0 -18px 70px rgba(124, 113, 179, .1);
+}
+@media (max-width: 767px) {
+  .stage-arch {
+    top: -7%;
+    width: 118vw;
+    height: 88%;
+    transform: translateX(-50%) translateZ(-70px);
+  }
+  .stage-floor {
+    bottom: -48%;
+    height: 72%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage-depth, .stage-arch, .stage-floor { transform-style: flat; }
+}
