@@ -89,7 +89,8 @@ export function ThreePerfumeCarousel({
     let frame = 0;
     let lastRender = 0;
     let disposed = false;
-    let pointerDown: { x: number; y: number; lastX: number; slot: Slot | null; moved: boolean } | null = null;\n    let ready = false;
+    let pointerDown: { x: number; y: number; lastX: number; slot: Slot | null; moved: boolean } | null = null;
+    let ready = false;
 
     const resize = () => {
       const width = Math.max(1, canvas.clientWidth || window.innerWidth);
