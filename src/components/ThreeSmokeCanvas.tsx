@@ -36,7 +36,7 @@ export function ThreeSmokeCanvas({ api }: { api: React.MutableRefObject<SmokeHan
     const camera = new THREE.OrthographicCamera(0, 1, 0, 1, -10, 10);
     camera.position.z = 2;
 
-    const capacity = 280;
+    const capacity = 440;
     const positions = new Float32Array(capacity * 3);
     const sizes = new Float32Array(capacity);
     const opacities = new Float32Array(capacity);
@@ -114,7 +114,7 @@ export function ThreeSmokeCanvas({ api }: { api: React.MutableRefObject<SmokeHan
           float body = 1.0 - smoothstep(edge - 0.12, edge + 0.2, d);
           float inner = exp(-d * d * 5.2);
           float wisps = smoothstep(0.28, 0.78, detail) * body;
-          float alpha = min(0.78, vOpacity * body * (0.72 + inner * 0.62) * (0.82 + wisps * 0.38));
+          float alpha = min(0.88, vOpacity * body * (0.72 + inner * 0.62) * (0.82 + wisps * 0.38));
           if (alpha < 0.003) discard;
 
           vec3 deep = mix(vColor, vec3(0.22, 0.18, 0.38), 0.22);
@@ -157,10 +157,10 @@ export function ThreeSmokeCanvas({ api }: { api: React.MutableRefObject<SmokeHan
         vx: (Math.random() - 0.5) * (core ? 9 : wisp ? 22 : 15) * scale,
         vy: -(core ? 91 + Math.random() * 38 : wisp ? 58 + Math.random() * 34 : 43 + Math.random() * 34) * scale,
         age: 0,
-        life: core ? 3.2 + Math.random() * 1.2 : 5.2 + Math.random() * 2.4,
-        size: (core ? 12 + Math.random() * 7 : wisp ? 27 + Math.random() * 16 : 40 + Math.random() * 24) * scale,
+        life: core ? 3.8 + Math.random() * 1.4 : 6 + Math.random() * 2.2,
+        size: (core ? 15 + Math.random() * 9 : wisp ? 34 + Math.random() * 18 : 50 + Math.random() * 28) * scale,
         growth: (core ? 13 : wisp ? 24 : 31) * scale,
-        alpha: core ? 0.24 : wisp ? 0.19 : 0.27,
+        alpha: core ? 0.32 : wisp ? 0.28 : 0.38,
         seed: Math.random() * Math.PI * 2,
         color: emitter.color.clone(),
         core,
@@ -176,12 +176,12 @@ export function ThreeSmokeCanvas({ api }: { api: React.MutableRefObject<SmokeHan
       if (emitter) {
         emitter.elapsed += dt;
         const t = emitter.elapsed;
-        const rate = t < 1.7 ? 42 : t < 5.8 ? 26 : t < 9.2 ? 11 : 0;
+        const rate = t < 1.7 ? 70 : t < 5.8 ? 46 : t < 9.2 ? 22 : 0;
         if (Math.random() < rate * dt) {
           spawn("cloud");
-          if (Math.random() > 0.3) spawn("wisp");
+          if (Math.random() > 0.08) spawn("wisp");
         }
-        if (Math.random() < (t < 3.8 ? 10 : 4) * dt) spawn("core");
+        if (Math.random() < (t < 3.8 ? 15 : 7) * dt) spawn("core");
         if (t > 10.5) emitter = null;
       }
 
@@ -202,7 +202,7 @@ export function ThreeSmokeCanvas({ api }: { api: React.MutableRefObject<SmokeHan
         p.y += p.vy * dt;
         p.size += p.growth * dt;
 
-        const envelope = Math.sin(Math.PI * Math.min(1, progress)) ** 1.25;
+        const envelope = Math.sin(Math.PI * Math.min(1, progress)) ** 0.9;
         positions[alive * 3] = p.x;
         positions[alive * 3 + 1] = p.y;
         positions[alive * 3 + 2] = 0;
@@ -233,7 +233,7 @@ export function ThreeSmokeCanvas({ api }: { api: React.MutableRefObject<SmokeHan
       burst: (x, y, color) => {
         particles = [];
         emitter = { x, y, elapsed: 0, color: new THREE.Color(color) };
-        for (let i = 0; i < 20; i++) spawn(i % 4 === 0 ? "core" : i % 3 === 0 ? "wisp" : "cloud");
+        for (let i = 0; i < 32; i++) spawn(i % 4 === 0 ? "core" : i % 3 === 0 ? "wisp" : "cloud");
       },
       stop: () => { emitter = null; },
     };
