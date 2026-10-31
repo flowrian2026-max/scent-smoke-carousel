@@ -34,6 +34,7 @@ const STEP = (Math.PI * 2) / N;
 
 function Index() {
   const [rot, setRot] = useState(0);
+  const [curtainOpen, setCurtainOpen] = useState(false);
   const [open, setOpen] = useState<number | null>(null);
   const rotRef = useRef(0);
   const target = useRef(0);
@@ -46,6 +47,7 @@ function Index() {
     const onResize = () => setSize({ w: window.innerWidth, h: window.innerHeight });
     onResize();
     window.addEventListener("resize", onResize);
+    const curtainTimer = window.setTimeout(() => setCurtainOpen(true), 850);
     let raf = 0;
     let lastPaint = 0;
     const loop = (now: number) => {
@@ -60,6 +62,7 @@ function Index() {
     raf = requestAnimationFrame(loop);
     return () => {
       cancelAnimationFrame(raf);
+      window.clearTimeout(curtainTimer);
       window.removeEventListener("resize", onResize);
       if (smokeTimer.current !== null) window.clearTimeout(smokeTimer.current);
     };
@@ -231,6 +234,22 @@ function Index() {
       <p className="pointer-events-none absolute bottom-6 left-0 right-0 z-40 text-center text-xs tracking-widest text-muted-foreground">
         بکشید تا سکو بچرخد · روی ادکلن بزنید تا گنبد باز شود
       </p>
+
+      {/* Velvet entrance curtain: a reveal layer over the original rotating four-bottle gallery. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[60] flex overflow-hidden">
+        <div
+          className={`relative h-full w-1/2 transition-transform duration-[2600ms] ease-[cubic-bezier(.78,0,.18,1)] ${curtainOpen ? "-translate-x-full" : "translate-x-0"}`}
+          style={{ background: "repeating-linear-gradient(90deg, rgba(0,0,0,.72) 0 3.5%, rgba(91,83,119,.32) 5.5%, rgba(5,8,18,.78) 9.5%, rgba(45,41,66,.22) 12%), linear-gradient(90deg,#050814 0%,#1a192b 30%,#0b1020 100%)", boxShadow: "inset -24px 0 55px rgba(0,0,0,.7), inset 0 0 90px rgba(0,0,0,.42)" }}
+        >
+          <div className="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-slate-200/50 to-transparent" />
+        </div>
+        <div
+          className={`relative h-full w-1/2 transition-transform duration-[2600ms] ease-[cubic-bezier(.78,0,.18,1)] ${curtainOpen ? "translate-x-full" : "translate-x-0"}`}
+          style={{ background: "repeating-linear-gradient(90deg, rgba(0,0,0,.72) 0 3.5%, rgba(91,83,119,.32) 5.5%, rgba(5,8,18,.78) 9.5%, rgba(45,41,66,.22) 12%), linear-gradient(270deg,#050814 0%,#1a192b 30%,#0b1020 100%)", boxShadow: "inset 24px 0 55px rgba(0,0,0,.7), inset 0 0 90px rgba(0,0,0,.42)" }}
+        >
+          <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-slate-200/50 to-transparent" />
+        </div>
+      </div>
     </main>
   );
 }
