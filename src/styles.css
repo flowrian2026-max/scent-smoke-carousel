@@ -395,3 +395,24 @@
 @media (prefers-reduced-motion: reduce) {
   .curtain-panel::before { animation: none; }
 }
+
+
+/* Guaranteed entrance reveal: CSS owns the opening so hydration/state cannot leave it shut. */
+.curtain-panel-left {
+  animation: curtain-part-left 2.8s cubic-bezier(.78, 0, .18, 1) .85s forwards;
+}
+.curtain-panel-right {
+  animation: curtain-part-right 2.8s cubic-bezier(.78, 0, .18, 1) .85s forwards;
+}
+@keyframes curtain-part-left {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-101%, 0, 0); }
+}
+@keyframes curtain-part-right {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(101%, 0, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .curtain-panel-left { animation-duration: .01ms; }
+  .curtain-panel-right { animation-duration: .01ms; }
+}
