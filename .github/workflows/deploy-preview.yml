@@ -1,9 +1,6 @@
 name: Deploy cinematic smoke preview
 
 on:
-  push:
-    branches:
-      - v-gbt-cinematic-smoke
   workflow_dispatch:
 
 jobs:
