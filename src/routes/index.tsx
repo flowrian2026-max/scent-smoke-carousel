@@ -147,7 +147,14 @@ function Index() {
       }}
       onPointerCancel={() => (drag.current = null)}
     >
-      <div className="fashion-backdrop pointer-events-none absolute inset-0" />
+      <div className="fashion-backdrop pointer-events-none absolute inset-0">
+        <div className="stage-depth" aria-hidden="true">
+          <div className="stage-arch">
+            <div className="stage-arch-inner" />
+          </div>
+          <div className="stage-floor" />
+        </div>
+      </div>
       <div className="fashion-grain pointer-events-none absolute inset-0" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_42%_55%_at_42%_0%,var(--glow),transparent_72%)]" />
       <div
