@@ -250,13 +250,13 @@ function Index() {
       {/* Velvet entrance curtain: a reveal layer over the original rotating four-bottle gallery. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[60] flex overflow-hidden">
         <div
-          className="relative h-full w-1/2"
+          className="curtain-panel curtain-panel-left relative h-full w-1/2"
           style={{ transform: curtainOpen ? "translateX(-100%)" : "translateX(0)", transition: "transform 2600ms cubic-bezier(.78,0,.18,1)", willChange: "transform", background: "repeating-linear-gradient(90deg, rgba(0,0,0,.72) 0 3.5%, rgba(91,83,119,.32) 5.5%, rgba(5,8,18,.78) 9.5%, rgba(45,41,66,.22) 12%), linear-gradient(90deg,#050814 0%,#1a192b 30%,#0b1020 100%)", boxShadow: "inset -24px 0 55px rgba(0,0,0,.7), inset 0 0 90px rgba(0,0,0,.42)" }}
         >
           <div className="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-slate-200/50 to-transparent" />
         </div>
         <div
-          className="relative h-full w-1/2"
+          className="curtain-panel curtain-panel-right relative h-full w-1/2"
           style={{ transform: curtainOpen ? "translateX(100%)" : "translateX(0)", transition: "transform 2600ms cubic-bezier(.78,0,.18,1)", willChange: "transform", background: "repeating-linear-gradient(90deg, rgba(0,0,0,.72) 0 3.5%, rgba(91,83,119,.32) 5.5%, rgba(5,8,18,.78) 9.5%, rgba(45,41,66,.22) 12%), linear-gradient(270deg,#050814 0%,#1a192b 30%,#0b1020 100%)", boxShadow: "inset 24px 0 55px rgba(0,0,0,.7), inset 0 0 90px rgba(0,0,0,.42)" }}
         >
           <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-slate-200/50 to-transparent" />
