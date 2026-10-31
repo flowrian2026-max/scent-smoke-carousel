@@ -5,6 +5,7 @@ import rose from "@/assets/bottle-rose.png";
 import violet from "@/assets/bottle-violet.png";
 import blue from "@/assets/bottle-blue.png";
 import { ThreeSmokeCanvas, type ThreeSmokeHandle } from "@/components/ThreeSmokeCanvas";
+import { ThreeStageCanvas } from "@/components/ThreeStageCanvas";
 
 type Perfume = { name: string; note: string; color: string; img: string };
 
@@ -19,7 +20,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Maison d'Essence — عطرهای لوکس" },
-      { name: "description", content: "ویترین سینمایی عطرها با سکوی گردان، گنبد شیشه‌ای و مه رایحه." },
+      { name: "description", content: "ویترین سینمایی عطرها با سکوی گردان، معماری قوس‌دار سه‌بعدی و مه رایحه." },
       { property: "og:title", content: "Maison d'Essence — عطرهای لوکس" },
       { property: "og:description", content: "ویترین تعاملی عطرها با عمق‌نمایی و دود رنگی." },
       { property: "og:type", content: "website" },
@@ -42,6 +43,7 @@ function Index() {
   const smoke = useRef<ThreeSmokeHandle | null>(null);
   const smokeTimer = useRef<number | null>(null);
   const [size, setSize] = useState({ w: 1000, h: 800 });
+  const [stageReady, setStageReady] = useState(false);
 
   useEffect(() => {
     const onResize = () => setSize({ w: window.innerWidth, h: window.innerHeight });
@@ -75,7 +77,7 @@ function Index() {
   const cy = size.h * (mobile ? 0.6 : 0.62);
   const bottleH = mobile ? size.h * 0.3 : size.h * 0.42;
 
-  const closeDome = () => {
+  const stopSmoke = () => {
     if (smokeTimer.current !== null) {
       window.clearTimeout(smokeTimer.current);
       smokeTimer.current = null;
@@ -84,7 +86,7 @@ function Index() {
     smoke.current?.stop();
   };
 
-  const openDome = (i: number) => {
+  const releaseSmoke = (i: number) => {
     if (smokeTimer.current !== null) window.clearTimeout(smokeTimer.current);
     setOpen(i);
     const angle = i * STEP + rotRef.current;
@@ -107,11 +109,11 @@ function Index() {
       if (d > N / 2) d -= N;
       if (d < -N / 2) d += N;
       target.current = Math.round(rotRef.current / STEP) * STEP - d * STEP;
-      closeDome();
+      stopSmoke();
       return;
     }
-    if (open === i) closeDome();
-    else openDome(i);
+    if (open === i) stopSmoke();
+    else releaseSmoke(i);
   };
 
   return (
@@ -130,7 +132,7 @@ function Index() {
         const delta = dx * (mobile ? 0.008 : 0.005);
         rotRef.current += delta;
         d.vel = delta;
-        if (d.moved > 8 && open !== null) closeDome();
+        if (d.moved > 8 && open !== null) stopSmoke();
       }}
       onPointerUp={() => {
         const d = drag.current;
@@ -151,6 +153,7 @@ function Index() {
           </div>
           <div className="stage-floor" />
         </div>
+        <ThreeStageCanvas onReady={setStageReady} />
       </div>
       <div className="fashion-grain pointer-events-none absolute inset-0" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_42%_55%_at_42%_0%,var(--glow),transparent_72%)]" />
@@ -214,12 +217,12 @@ function Index() {
               style={{ background: `radial-gradient(ellipse at 50% 80%, ${p.color}66, transparent 72%)`, opacity: isOpen ? 0 : 0.38 + 0.2 * depth }}
             />
             <div
-              className="pointer-events-none absolute inset-x-[4%] bottom-[9%] top-[-6%] z-20 transition-[transform,opacity] duration-[1500ms] ease-[cubic-bezier(.3,.7,.2,1)]"
-              style={{ transform: isOpen ? "translate(-8%, -88%) rotate(-15deg)" : "none", opacity: isOpen ? 0 : 1 }}
-            >
-              <div className="glass-dome absolute inset-0 rounded-t-[50%_38%] rounded-b-[6%]" />
-              <div className="absolute -top-[5%] left-1/2 h-[7%] w-[11%] -translate-x-1/2 rounded-full glass-knob" />
-            </div>
+              className="pointer-events-none absolute inset-x-[15%] bottom-[8%] z-0 h-[18%] rounded-[50%] blur-2xl transition-opacity duration-700"
+              style={{
+                background: "radial-gradient(ellipse at 50% 55%, " + p.color + "66, transparent 72%)",
+                opacity: isOpen ? 0.18 : 0.34 + 0.12 * depth,
+              }}
+            />
           </div>
         );
       })}
@@ -241,11 +244,11 @@ function Index() {
       </div>
 
       <p className="pointer-events-none absolute bottom-6 left-0 right-0 z-40 text-center text-xs tracking-widest text-muted-foreground">
-        بکشید تا سکو بچرخد · روی ادکلن بزنید تا گنبد باز شود
+        بکشید تا سکو بچرخد · روی عطر بزنید تا مه رایحه آزاد شود
       </p>
 
-      {/* Velvet entrance curtain: a reveal layer over the original rotating four-bottle gallery. */}
-      <div aria-hidden="true" dir="ltr" className="pointer-events-none absolute inset-0 z-[60] flex overflow-hidden">
+      {/* WebGL velvet panels own the main reveal; CSS remains the WebGL fallback. */}
+      {!stageReady && <div aria-hidden="true" dir="ltr" className="pointer-events-none absolute inset-0 z-[60] flex overflow-hidden">
         <div
           className="curtain-panel curtain-panel-left relative h-full w-1/2"
           style={{ background: "repeating-linear-gradient(90deg, rgba(0,0,0,.72) 0 3.5%, rgba(91,83,119,.32) 5.5%, rgba(5,8,18,.78) 9.5%, rgba(45,41,66,.22) 12%), linear-gradient(90deg,#050814 0%,#1a192b 30%,#0b1020 100%)", boxShadow: "inset -24px 0 55px rgba(0,0,0,.7), inset 0 0 90px rgba(0,0,0,.42)" }}
@@ -258,7 +261,7 @@ function Index() {
         >
           <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-slate-200/50 to-transparent" />
         </div>
-      </div>
+      </div>}
     </main>
   );
 }
