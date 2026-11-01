@@ -93,7 +93,7 @@ box-shadow:inset 0 0 100px 30px #02040b,0 0 40px #02040b}
 <body>
 <main class="scene" id="scene">
   <div class="backdrop" aria-hidden="true"></div>
-  <video class="ambient-video" id="ambientVideo" muted autoplay loop playsinline data-video-src="https://raw.githubusercontent.com/flowrian2026-max/Midnight-file-test/main/Ariooo/sakhre%20poshte%20hero.mp4"></video>
+  <video class="ambient-video" id="ambientVideo" src="https://raw.githubusercontent.com/flowrian2026-max/Midnight-file-test/main/Ariooo/sakhre%20poshte%20hero.mp4" muted autoplay loop playsinline preload="auto"></video>
   <div class="halo" aria-hidden="true"></div>
 
   <header class="topbar">
@@ -165,13 +165,7 @@ box-shadow:inset 0 0 100px 30px #02040b,0 0 40px #02040b}
   const scene = document.getElementById('scene');
   const detail = document.getElementById('detail');
   let revealTimer;
-  const ambient = document.getElementById('ambientVideo');
-  // Only the rock-cliff background video is used; the smoke layer has been removed.
-  if (ambient?.dataset.videoSrc) {
-    ambient.src = ambient.dataset.videoSrc;
-    ambient.load();
-    ambient.play().catch(() => {});
-  }
+  // Rock-cliff footage is loaded directly by the video element; no smoke layer.
   function replay() {
     window.clearTimeout(revealTimer);
     detail.classList.remove('visible');
