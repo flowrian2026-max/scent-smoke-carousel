@@ -105,7 +105,7 @@ linear-gradient(180deg,rgba(0,0,0,.34),transparent 20%,transparent 82%,rgba(0,0,
 .intro-layer{position:fixed;inset:0;z-index:30;background:#05030e;opacity:1;visibility:visible;transition:opacity 1.7s ease,visibility 1.7s;overflow:hidden}
 .intro-layer.done{opacity:0;visibility:hidden;pointer-events:none}
 .intro-layer video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;background:#05030e}
-@media(max-width:680px){.intro-layer video{object-fit:cover;object-position:center center;transform:scale(1.04)}}
+@media(max-width:680px){.intro-layer video{object-fit:contain;object-position:center center;transform:none}}
 .intro-vignette{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 48%,rgba(4,3,12,.62) 100%);pointer-events:none}
 .intro-hint{position:absolute;left:0;right:0;bottom:8vh;text-align:center;color:#f1eafa;letter-spacing:.34em;font:11px/1.5 Arial,sans-serif;text-shadow:0 0 18px #9c83c9;transition:opacity .5s}
 .intro-dots{display:flex;justify-content:center;gap:12px;margin-top:16px}
@@ -278,8 +278,8 @@ radial-gradient(ellipse at 48% 28%,rgba(116,101,177,.45),transparent 34%)}
     window.setTimeout(() => smoke.classList.add('rising'), 1500);
   }
   bottleVideo.addEventListener('timeupdate', () => {
-    if (introMode === 'idle' && bottleVideo.currentTime >= 1.25) {
-      bottleVideo.currentTime = 0;
+    if (introMode === 'idle' && bottleVideo.currentTime >= 1.9) {
+      bottleVideo.currentTime = 0.08;
       if (bottleVideo.paused) bottleVideo.play().catch(() => {});
     } else if (introMode === 'impact' && bottleVideo.currentTime >= hitStops[hits - 1] + 0.42) {
       // A moving half-second loop preserves the visible crack stage between taps.
