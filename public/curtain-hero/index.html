@@ -248,7 +248,9 @@ box-shadow:inset 0 0 100px 30px #02040b,0 0 40px #02040b}
     }
   }, true);
 
-  gallery.addEventListener('keydown', event => {
+  document.addEventListener('keydown', event => {
+    if (!scene.classList.contains('open')) return;
+    if (event.target.closest('input, textarea, select, button, a, [contenteditable="true"]')) return;
     if (event.key === 'ArrowRight') { event.preventDefault(); applyRotation(rotation + 18); }
     if (event.key === 'ArrowLeft') { event.preventDefault(); applyRotation(rotation - 18); }
   });
