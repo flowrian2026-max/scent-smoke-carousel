@@ -41,7 +41,7 @@ linear-gradient(110deg,#080d1b,#171a2d 48%,#090e1b)}
 .product{--radius:clamp(190px,28vw,360px);position:absolute;left:50%;top:50%;width:clamp(145px,19vw,230px);margin-left:clamp(-115px,-9.5vw,-72px);text-align:center;cursor:pointer;outline:none;transform-style:preserve-3d;transform:translateY(-50%) rotateY(calc(var(--i)*72deg)) translateZ(var(--radius));filter:drop-shadow(0 20px 24px rgba(0,0,0,.45));backface-visibility:visible;transition:filter .35s}
 .product:hover,.product:focus-visible{filter:drop-shadow(0 24px 30px rgba(130,145,195,.32)) brightness(1.08)}
 .bottle-wrap{height:clamp(190px,26vw,320px);display:flex;align-items:flex-end;justify-content:center;position:relative}
-.bottle-photo{width:100%;height:100%;object-fit:contain;object-position:center bottom;overflow:visible;filter:drop-shadow(0 16px 22px rgba(0,0,0,.34));}
+.bottle-photo{width:100%;height:100%;object-fit:contain;object-position:center bottom;overflow:visible;transform:scaleX(1.65);transform-origin:center bottom;filter:drop-shadow(0 16px 22px rgba(0,0,0,.34));}
 .orbit{position:absolute;z-index:-1;bottom:13px;width:92%;height:46px;border:1px solid rgba(208,220,243,.45);border-radius:50%;transform:rotateX(67deg);box-shadow:0 0 20px rgba(151,173,220,.15),inset 0 0 15px rgba(183,196,225,.08)}
 .plinth{position:relative;height:14px;width:100%;border-radius:50%;border:1px solid rgba(215,224,242,.64);background:linear-gradient(180deg,#667087 0%,#212a3d 37%,#080d1a 100%);box-shadow:0 9px 25px #02040b,inset 0 1px 3px rgba(255,255,255,.38)}
 .plinth:before{content:"";position:absolute;left:8%;right:8%;top:-4px;height:4px;border-radius:50%;background:linear-gradient(90deg,transparent,#aab7d0 21%,#f0f3fa 49%,#8794ae 78%,transparent);box-shadow:0 0 12px rgba(207,219,241,.6)}
@@ -83,7 +83,7 @@ box-shadow:inset 0 0 100px 30px #02040b,0 0 40px #02040b}
  .hero-copy{top:16%;width:94%}.hero-copy h1{font-size:clamp(32px,9vw,46px);letter-spacing:.06em;margin:14px 0}.hero-copy p{font-size:8px;letter-spacing:.15em;line-height:1.7}
  .gallery{top:62%;height:260px;perspective:900px}
  .product{--radius:clamp(135px,37vw,190px);width:34vw;margin-left:-17vw}
- .bottle-wrap{height:clamp(155px,30vh,205px)}.plinth{height:11px}.plinth:after{top:9px;height:20px}
+ .bottle-wrap{height:clamp(155px,30vh,205px)}.bottle-photo{transform:scaleX(1.4)}.plinth{height:11px}.plinth:after{top:9px;height:20px}
  .scene-rule{display:none}.detail{right:12px;bottom:58px;width:calc(100vw - 24px);padding:17px 18px}.detail h2{font-size:19px}
  .controls{bottom:12px}.controls button{padding:8px 11px;font-size:7px}.start-note{bottom:57px;font-size:7px;letter-spacing:.18em}
 }
