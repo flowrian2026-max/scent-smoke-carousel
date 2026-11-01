@@ -38,7 +38,7 @@ linear-gradient(110deg,#080d1b,#171a2d 48%,#090e1b)}
 .gallery.dragging{cursor:grabbing}
 .gallery.dragging *{user-select:none}
 .carousel-track{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateY(var(--rotation,0deg));will-change:transform}
-.product{--radius:clamp(190px,28vw,360px);position:absolute;left:50%;top:0;width:clamp(112px,15vw,190px);margin-left:clamp(-95px,-7.5vw,-56px);text-align:center;cursor:pointer;outline:none;transform-style:preserve-3d;transform:rotateY(calc(var(--i)*72deg)) translateZ(var(--radius));filter:drop-shadow(0 20px 24px rgba(0,0,0,.45));backface-visibility:visible;transition:filter .35s}
+.product{--radius:clamp(190px,28vw,360px);position:absolute;left:50%;top:50%;width:clamp(112px,15vw,190px);margin-left:clamp(-95px,-7.5vw,-56px);text-align:center;cursor:pointer;outline:none;transform-style:preserve-3d;transform:translateY(-50%) rotateY(calc(var(--i)*72deg)) translateZ(var(--radius));filter:drop-shadow(0 20px 24px rgba(0,0,0,.45));backface-visibility:visible;transition:filter .35s}
 .product:hover,.product:focus-visible{filter:drop-shadow(0 24px 30px rgba(130,145,195,.32)) brightness(1.08)}
 .bottle-wrap{height:clamp(178px,24vw,292px);display:flex;align-items:flex-end;justify-content:center;position:relative}
 .bottle-photo{width:100%;height:100%;object-fit:contain;object-position:center bottom;overflow:visible;filter:drop-shadow(0 16px 22px rgba(0,0,0,.34));}
