@@ -19,11 +19,8 @@ linear-gradient(110deg,#080d1b,#171a2d 48%,#090e1b)}
 .backdrop:before,.backdrop:after{content:"";position:absolute;inset:-25%;pointer-events:none;filter:blur(34px);background:linear-gradient(112deg,transparent 37%,rgba(201,213,238,.08) 47%,transparent 56%);transform:translateX(-22%) rotate(-8deg);animation:lightSweep 17s ease-in-out infinite alternate}
 .backdrop:after{transform:translateX(24%) rotate(9deg);opacity:.6;animation-delay:-8s}
 @keyframes lightSweep{to{transform:translateX(27%) rotate(7deg)}}
-.ambient-video,.smoke-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
-.ambient-video{z-index:0;opacity:.62;mix-blend-mode:normal;filter:brightness(.58) saturate(.78) contrast(1.12)}
-.smoke-video{z-index:1;opacity:.52;mix-blend-mode:screen;mask-image:linear-gradient(transparent,#000 12%,#000 90%,transparent)}
-/* Smoke V4 is connected as an independent screen-blended layer.
-   The environment layer remains intentionally separate for its own footage. The rock-cliff video is the live environment plate; smoke stays above it and behind the bottles. */
+.ambient-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;z-index:0;opacity:.62;mix-blend-mode:normal;filter:brightness(.58) saturate(.78) contrast(1.12)}
+/* The rock-cliff footage is the only video layer. No smoke overlay. */
 .halo{position:absolute;z-index:1;left:50%;top:55%;width:min(76vw,1000px);height:min(34vw,430px);transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(135,144,190,.13),transparent 67%);filter:blur(20px);pointer-events:none}
 .topbar{position:absolute;z-index:6;top:0;left:0;right:0;padding:28px clamp(20px,5vw,76px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(200,211,233,.1)}
 .wordmark{font-size:17px;letter-spacing:.34em;color:#e6eaf4;white-space:nowrap}
@@ -36,12 +33,11 @@ linear-gradient(110deg,#080d1b,#171a2d 48%,#090e1b)}
 .kicker{font:9px Arial,sans-serif;letter-spacing:.46em;color:#a7b3d0;text-transform:uppercase}
 .hero-copy h1{font-size:clamp(37px,5.7vw,78px);font-weight:400;line-height:.98;letter-spacing:.095em;margin:17px 0 13px;text-shadow:0 6px 38px #03050b}
 .hero-copy p{margin:0;font:10px Arial,sans-serif;letter-spacing:.27em;color:#a9b2c8}
-.gallery{position:absolute;z-index:3;left:50%;top:63%;width:100%;height:clamp(270px,36vw,390px);perspective:1400px;opacity:0;transform:translate(-50%,calc(-50% + 28px));transition:opacity 1.5s 1s,transform 1.65s 1s;overflow:visible}
+.gallery{position:absolute;z-index:3;left:50%;top:63%;width:100%;height:clamp(270px,36vw,390px);perspective:1400px;opacity:0;transform:translate(-50%,calc(-50% + 28px));transition:opacity 1.5s 1s,transform 1.65s 1s;overflow:visible;touch-action:pan-y;cursor:grab;}
 .scene.open .gallery{opacity:1;transform:translate(-50%,-50%)}
-.carousel-track{position:absolute;inset:0;transform-style:preserve-3d;animation:none}
-.scene.open .carousel-track{animation:carouselSpin 38s linear infinite}
-.gallery:hover .carousel-track,.gallery:focus-within .carousel-track{animation-play-state:paused}
-@keyframes carouselSpin{from{transform:rotateY(0deg)}to{transform:rotateY(360deg)}}
+.gallery.dragging{cursor:grabbing}
+.gallery.dragging *{user-select:none}
+.carousel-track{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateY(var(--rotation,0deg));will-change:transform}
 .product{--radius:clamp(190px,28vw,360px);position:absolute;left:50%;top:0;width:clamp(112px,15vw,190px);margin-left:clamp(-95px,-7.5vw,-56px);text-align:center;cursor:pointer;outline:none;transform-style:preserve-3d;transform:rotateY(calc(var(--i)*72deg)) translateZ(var(--radius));filter:drop-shadow(0 20px 24px rgba(0,0,0,.45));backface-visibility:visible;transition:filter .35s}
 .product:hover,.product:focus-visible{filter:drop-shadow(0 24px 30px rgba(130,145,195,.32)) brightness(1.08)}
 .bottle-wrap{height:clamp(178px,24vw,292px);display:flex;align-items:flex-end;justify-content:center;position:relative}
@@ -98,19 +94,18 @@ box-shadow:inset 0 0 100px 30px #02040b,0 0 40px #02040b}
 <main class="scene" id="scene">
   <div class="backdrop" aria-hidden="true"></div>
   <video class="ambient-video" id="ambientVideo" muted autoplay loop playsinline data-video-src="https://raw.githubusercontent.com/flowrian2026-max/Midnight-file-test/main/Ariooo/sakhre%20poshte%20hero.mp4"></video>
-  <video class="smoke-video" id="smokeVideo" muted autoplay loop playsinline preload="metadata" data-video-src="https://raw.githubusercontent.com/flowrian2026-max/Midnight-file-test/main/smoke-references/Smoke%20version%204.mp4"></video>
   <div class="halo" aria-hidden="true"></div>
 
   <header class="topbar">
     <div class="wordmark">SCENT SCRIBE<span>THE PRIVATE FRAGRANCE GALLERY</span></div>
     <nav class="nav"><a href="#gallery">COLLECTION</a><a href="#gallery">THE ATELIER</a><a href="#gallery">DISCOVER</a></nav>
-    <div class="top-index">EXHIBITION 01 / 03</div>
+    <div class="top-index">EXHIBITION 01 / 05</div>
   </header>
 
   <section class="hero-copy">
     <div class="kicker">A STUDY IN FRAGRANCE</div>
     <h1>BEYOND THE SCENT</h1>
-    <p>THREE DISTINCT WORLDS. ONE UNFORGETTABLE IMPRESSION.</p>
+    <p>FIVE DISTINCT FRAGRANCES. ONE UNFORGETTABLE IMPRESSION.</p>
   </section>
 
   <div class="scene-rule">SCENT · FORM · ATMOSPHERE</div>
@@ -175,12 +170,12 @@ box-shadow:inset 0 0 100px 30px #02040b,0 0 40px #02040b}
   const detail = document.getElementById('detail');
   let revealTimer;
   const ambient = document.getElementById('ambientVideo');
-  const smoke = document.getElementById('smokeVideo');
-  // Real footage can be connected independently by filling data-video-src.
-  [ambient, smoke].forEach(video => {
-    const src = video.dataset.videoSrc;
-    if (src) { video.src = src; video.load(); video.play().catch(() => {}); }
-  });
+  // Only the rock-cliff background video is used; the smoke layer has been removed.
+  if (ambient?.dataset.videoSrc) {
+    ambient.src = ambient.dataset.videoSrc;
+    ambient.load();
+    ambient.play().catch(() => {});
+  }
   function replay() {
     window.clearTimeout(revealTimer);
     detail.classList.remove('visible');
@@ -207,6 +202,67 @@ box-shadow:inset 0 0 100px 30px #02040b,0 0 40px #02040b}
     });
   });
   document.getElementById('detailClose').addEventListener('click', () => detail.classList.remove('visible'));
+
+  // Five-product carousel: swipe/drag on phones and mouse-wheel/trackpad on desktop.
+  const gallery = document.querySelector('.gallery');
+  const track = document.querySelector('.carousel-track');
+  let rotation = 0;
+  let activePointer = null;
+  let lastPointerX = 0;
+  let pointerStartX = 0;
+  let didDrag = false;
+  let suppressClickUntil = 0;
+  const applyRotation = value => {
+    rotation = value;
+    track.style.setProperty('--rotation', rotation + 'deg');
+  };
+
+  gallery.addEventListener('wheel', event => {
+    if (!scene.classList.contains('open')) return;
+    event.preventDefault();
+    const delta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
+    applyRotation(rotation - delta * 0.38);
+  }, { passive: false });
+
+  gallery.addEventListener('pointerdown', event => {
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    activePointer = event.pointerId;
+    lastPointerX = pointerStartX = event.clientX;
+    didDrag = false;
+    gallery.setPointerCapture(event.pointerId);
+  });
+
+  gallery.addEventListener('pointermove', event => {
+    if (event.pointerId !== activePointer) return;
+    const dx = event.clientX - lastPointerX;
+    if (!didDrag && Math.abs(event.clientX - pointerStartX) > 6) {
+      didDrag = true;
+      gallery.classList.add('dragging');
+    }
+    if (didDrag) applyRotation(rotation + dx * 0.52);
+    lastPointerX = event.clientX;
+  });
+
+  const finishPointer = event => {
+    if (event.pointerId !== activePointer) return;
+    if (didDrag) suppressClickUntil = Date.now() + 350;
+    activePointer = null;
+    gallery.classList.remove('dragging');
+  };
+  gallery.addEventListener('pointerup', finishPointer);
+  gallery.addEventListener('pointercancel', finishPointer);
+  gallery.addEventListener('click', event => {
+    if (Date.now() < suppressClickUntil) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }, true);
+
+  gallery.addEventListener('keydown', event => {
+    if (event.key === 'ArrowRight') { event.preventDefault(); applyRotation(rotation + 18); }
+    if (event.key === 'ArrowLeft') { event.preventDefault(); applyRotation(rotation - 18); }
+  });
+
   replay();
 })();
 </script>
