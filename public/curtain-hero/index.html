@@ -37,7 +37,7 @@ linear-gradient(110deg,#080d1b,#171a2d 48%,#090e1b)}
 .scene.open .gallery{opacity:1;transform:translate(-50%,-50%)}
 .gallery.dragging{cursor:grabbing}
 .gallery.dragging *{user-select:none}
-.carousel-track{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateX(22deg) rotateY(var(--rotation,0deg));will-change:transform}
+.carousel-track{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateX(-22deg) rotateY(var(--rotation,0deg));will-change:transform}
 .product{--radius:clamp(205px,30vw,385px);position:absolute;left:50%;top:50%;width:clamp(135px,17.5vw,210px);margin-left:clamp(-105px,-8.75vw,-67px);text-align:center;cursor:pointer;outline:none;transform-style:preserve-3d;transform:translateY(-50%) rotateY(calc(var(--i)*75deg)) translateZ(var(--radius)) rotateY(calc(-1 * (var(--i)*75deg + var(--rotation,0deg))));filter:none;backface-visibility:visible;transition:filter .35s}
 .product:hover,.product:focus-visible{filter:none}
 .bottle-wrap{height:clamp(165px,22vw,270px);display:flex;align-items:flex-end;justify-content:center;position:relative}
