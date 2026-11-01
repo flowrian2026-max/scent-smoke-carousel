@@ -19,11 +19,8 @@ linear-gradient(110deg,#080d1b,#171a2d 48%,#090e1b)}
 .backdrop:before,.backdrop:after{content:"";position:absolute;inset:-25%;pointer-events:none;filter:blur(34px);background:linear-gradient(112deg,transparent 37%,rgba(201,213,238,.08) 47%,transparent 56%);transform:translateX(-22%) rotate(-8deg);animation:lightSweep 17s ease-in-out infinite alternate}
 .backdrop:after{transform:translateX(24%) rotate(9deg);opacity:.6;animation-delay:-8s}
 @keyframes lightSweep{to{transform:translateX(27%) rotate(7deg)}}
-.ambient-video,.smoke-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.ambient-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
 .ambient-video{z-index:0;opacity:.6;mix-blend-mode:screen}
-.smoke-video{z-index:1;opacity:.55;mix-blend-mode:screen;mask-image:linear-gradient(transparent,#000 12%,#000 90%,transparent)}
-/* Smoke V4 is connected as an independent screen-blended layer.
-   The environment layer remains intentionally separate for its own footage. */
 .halo{position:absolute;z-index:1;left:50%;top:55%;width:min(76vw,1000px);height:min(34vw,430px);transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(135,144,190,.13),transparent 67%);filter:blur(20px);pointer-events:none}
 .topbar{position:absolute;z-index:6;top:0;left:0;right:0;padding:28px clamp(20px,5vw,76px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(200,211,233,.1)}
 .wordmark{font-size:17px;letter-spacing:.34em;color:#e6eaf4;white-space:nowrap}
@@ -121,7 +118,6 @@ box-shadow:inset 0 0 100px 30px #02040b,0 0 40px #02040b}
 <main class="scene" id="scene">
   <div class="backdrop" aria-hidden="true"></div>
   <video class="ambient-video" id="ambientVideo" muted autoplay loop playsinline data-video-src=""></video>
-  <video class="smoke-video" id="smokeVideo" muted autoplay loop playsinline preload="metadata" data-video-src="https://raw.githubusercontent.com/flowrian2026-max/Midnight-file-test/main/smoke-references/Smoke%20version%204.mp4"></video>
   <div class="halo" aria-hidden="true"></div>
 
   <header class="topbar">
@@ -239,9 +235,8 @@ box-shadow:inset 0 0 100px 30px #02040b,0 0 40px #02040b}
   const detail = document.getElementById('detail');
   let revealTimer;
   const ambient = document.getElementById('ambientVideo');
-  const smoke = document.getElementById('smokeVideo');
-  // Real footage can be connected independently by filling data-video-src.
-  [ambient, smoke].forEach(video => {
+  // The rock-and-smoke background film belongs on the ambient video only.
+  [ambient].forEach(video => {
     const src = video.dataset.videoSrc;
     if (src) { video.src = src; video.load(); video.play().catch(() => {}); }
   });
