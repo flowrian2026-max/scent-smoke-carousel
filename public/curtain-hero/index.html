@@ -89,9 +89,35 @@ box-shadow:inset 0 0 100px 30px #02040b,0 0 40px #02040b}
  .controls{bottom:12px}.controls button{padding:8px 11px;font-size:7px}.start-note{bottom:57px;font-size:7px;letter-spacing:.18em}
 }
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+
+/* Ocean bottle-breaking entrance — separate opening chapter before the curtain. */
+.ocean-intro{position:fixed;z-index:50;inset:0;display:grid;place-items:center;overflow:hidden;background:#050711;color:#f0f2f8;opacity:1;visibility:visible;transition:opacity 1.15s ease,visibility 1.15s}
+.ocean-intro.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
+.ocean-intro__video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#050711}
+.ocean-intro__shade{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 52%,transparent 38%,rgba(2,4,13,.42) 100%),linear-gradient(180deg,rgba(3,6,17,.18),transparent 45%,rgba(3,6,17,.48))}
+.ocean-intro__hint{position:absolute;z-index:2;bottom:max(8vh,calc(env(safe-area-inset-bottom) + 42px));left:0;right:0;text-align:center;font:500 9px Arial,sans-serif;letter-spacing:.34em;color:#e4e8f5;text-shadow:0 2px 18px #000;transition:opacity .45s}
+.ocean-intro__hint.is-hidden{opacity:0}
+.ocean-intro__dots{display:flex;justify-content:center;gap:9px;margin-top:15px}
+.ocean-intro__dots i{width:6px;height:6px;border:1px solid rgba(225,232,248,.8);border-radius:50%;transition:background .25s,box-shadow .25s}
+.ocean-intro__dots i.is-active{background:#dce4fa;box-shadow:0 0 12px rgba(195,207,245,.8)}
+.ocean-intro__enter{position:absolute;z-index:3;bottom:max(7vh,calc(env(safe-area-inset-bottom) + 28px));left:50%;transform:translate(-50%,12px);padding:14px 25px;border:1px solid rgba(220,228,247,.65);border-radius:40px;background:rgba(9,15,31,.46);backdrop-filter:blur(14px);color:#f0f2f8;font:9px Arial,sans-serif;letter-spacing:.28em;opacity:0;pointer-events:none;transition:opacity .65s,transform .65s;cursor:pointer}
+.ocean-intro__enter.is-visible{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+.ocean-intro__loading{position:absolute;z-index:4;inset:0;display:grid;place-items:center;background:#050711;font:9px Arial,sans-serif;letter-spacing:.35em;color:#cbd3e8;transition:opacity .5s;pointer-events:none}
+.ocean-intro__loading.is-hidden{opacity:0}
+@media(max-width:680px){.ocean-intro__video{object-fit:contain}.ocean-intro__hint{font-size:8px;letter-spacing:.23em;bottom:max(10vh,calc(env(safe-area-inset-bottom) + 48px))}}
+
 </style>
 </head>
 <body>
+
+<div class="ocean-intro" id="oceanIntro" aria-label="Interactive ocean entrance">
+  <video class="ocean-intro__video" id="oceanVideo" muted playsinline preload="auto"></video>
+  <div class="ocean-intro__shade" aria-hidden="true"></div>
+  <div class="ocean-intro__loading" id="oceanLoading">LOADING THE OCEAN</div>
+  <div class="ocean-intro__hint" id="oceanHint">TAP THE BOTTLE<div class="ocean-intro__dots" id="oceanDots"><i></i><i></i><i></i><i></i><i></i></div></div>
+  <button class="ocean-intro__enter" id="oceanEnter" type="button">ENTER THE GALLERY</button>
+</div>
+
 <main class="scene" id="scene">
   <div class="backdrop" aria-hidden="true"></div>
   <video class="ambient-video" id="ambientVideo" muted autoplay loop playsinline data-video-src=""></video>
@@ -245,9 +271,71 @@ box-shadow:inset 0 0 100px 30px #02040b,0 0 40px #02040b}
     });
   });
   document.getElementById('detailClose').addEventListener('click', () => detail.classList.remove('visible'));
-  replay();
+  // Keep the velvet curtain closed until the ocean introduction has finished.
 })();
 </script>
+
+<script>
+(() => {
+  const overlay = document.getElementById('oceanIntro');
+  const video = document.getElementById('oceanVideo');
+  const loading = document.getElementById('oceanLoading');
+  const hint = document.getElementById('oceanHint');
+  const dots = [...document.querySelectorAll('#oceanDots i')];
+  const enter = document.getElementById('oceanEnter');
+  const scene = document.getElementById('scene');
+  const videoUrl = 'https://raw.githubusercontent.com/flowrian2026-max/Midnight-file-test/main/Entrance.mp4';
+  const stopPoints = [2.0, 2.75, 3.5, 4.4];
+  let taps = 0;
+  let ready = false;
+  let finished = false;
+
+  video.src = videoUrl;
+  video.addEventListener('canplay', () => {
+    if (ready) return;
+    ready = true;
+    video.pause();
+    video.currentTime = 0;
+    loading.classList.add('is-hidden');
+  }, { once: true });
+  video.addEventListener('error', () => {
+    loading.textContent = 'OCEAN FILM COULD NOT LOAD';
+  });
+  video.addEventListener('timeupdate', () => {
+    if (taps > 0 && taps < 5 && video.currentTime >= stopPoints[taps - 1]) {
+      video.pause();
+      video.currentTime = stopPoints[taps - 1];
+    }
+  });
+  video.addEventListener('ended', () => {
+    finished = true;
+    hint.classList.add('is-hidden');
+    enter.classList.add('is-visible');
+  });
+
+  overlay.addEventListener('pointerdown', event => {
+    if (event.target.closest('#oceanEnter') || !ready || finished || taps >= 5) return;
+    taps += 1;
+    dots[taps - 1]?.classList.add('is-active');
+    if (taps === 1) video.currentTime = 0;
+    video.play().catch(() => { video.muted = true; video.play().catch(() => {}); });
+    if (taps === 5) {
+      hint.classList.add('is-hidden');
+      video.addEventListener('ended', () => enter.classList.add('is-visible'), { once: true });
+    }
+  });
+
+  enter.addEventListener('click', () => {
+    if (!finished) return;
+    overlay.classList.add('is-leaving');
+    window.setTimeout(() => {
+      overlay.remove();
+      scene.classList.add('open');
+    }, 950);
+  });
+})();
+</script>
+
 <!-- Curtain hero preview build trigger -->
 </body>
 </html>
