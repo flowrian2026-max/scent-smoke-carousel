@@ -50,8 +50,8 @@ linear-gradient(110deg,#080d1b,#171a2d 48%,#090e1b)}
 .product-sub{margin-top:7px;font:8px Arial,sans-serif;letter-spacing:.2em;color:#919db9}
 .scene-rule{position:absolute;z-index:2;left:clamp(20px,5vw,76px);bottom:clamp(30px,5vh,58px);font:8px Arial,sans-serif;letter-spacing:.27em;color:#818da9;writing-mode:vertical-rl}
 .curtains{position:absolute;inset:0;z-index:5;display:flex;pointer-events:none}
-.panel{width:50%;height:82%;position:relative;overflow:hidden;transition:transform 3.45s cubic-bezier(.22,1,.36,1);will-change:transform;}
-.panel .velvet{border-radius:0 0 48% 48%;}.panel.left{transform-origin:left center}.panel.right{transform-origin:right center}
+.panel{width:50%;height:82%;position:relative;overflow:hidden;clip-path:polygon(0 0,100% 0,100% 87%,92% 91%,82% 88%,72% 94%,60% 90%,50% 96%,40% 91%,28% 94%,17% 89%,8% 92%,0 88%);transition:transform 3.45s cubic-bezier(.22,1,.36,1);will-change:transform}
+.panel .velvet{border-radius:0;box-shadow:inset 0 0 95px 24px #02040b;}.panel.left{transform-origin:left center}.panel.right{transform-origin:right center}
 .velvet{position:absolute;inset:-2% -3%;background:
 radial-gradient(ellipse 13% 120% at 2% 50%,rgba(190,198,225,.34) 0%,rgba(122,127,164,.2) 34%,transparent 72%),
 radial-gradient(ellipse 16% 120% at 15% 50%,rgba(0,0,0,.94) 0%,rgba(3,6,16,.72) 42%,transparent 76%),
